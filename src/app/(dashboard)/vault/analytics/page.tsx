@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { usePasswordsQuery } from "@/hooks";
+import { usePasswordsQuery, useCategoriesQuery } from "@/hooks";
 import {
   DashboardWrapper,
   Skeleton,
@@ -31,7 +31,6 @@ import {
 import {
   Shield,
   AlertTriangle,
-  Clock,
   KeyRound,
   Lock,
   AlertCircle,
@@ -87,6 +86,16 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 
 export default function AnalyticsPage() {
   const { passwords, isPending } = usePasswordsQuery({});
+  const { categories } = useCategoriesQuery();
+
+  // Create a map of categoryId to category name
+  const categoryNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    categories.forEach((cat) => {
+      map.set(cat._id, cat.name);
+    });
+    return map;
+  }, [categories]);
 
   // Blue color for charts
   const blueColor = "217 91% 60%"; // hsl blue color
@@ -125,24 +134,21 @@ export default function AnalyticsPage() {
         100,
     );
 
-    // Average password age
-    const avgAge = Math.round(
-      passwords.reduce((sum, pwd) => {
-        const age =
-          (now - new Date(pwd.createdAt).getTime()) / (1000 * 60 * 60 * 24);
-        return sum + age;
-      }, 0) / passwords.length,
-    );
-
     // Passwords by category (top 5)
-    const categoryMap = new Map<string, number>();
+    const categoryCountMap = new Map<string, number>();
     passwords.forEach((pwd) => {
-      const cat = pwd.categoryId || "Uncategorized";
-      categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
+      const catId = pwd.categoryId || "Uncategorized";
+      categoryCountMap.set(catId, (categoryCountMap.get(catId) || 0) + 1);
     });
 
-    const categoryData = Array.from(categoryMap.entries())
-      .map(([category, count]) => ({ category, count }))
+    const categoryData = Array.from(categoryCountMap.entries())
+      .map(([catId, count]) => ({
+        category:
+          catId === "Uncategorized"
+            ? "Uncategorized"
+            : categoryNameMap.get(catId) || "Unknown",
+        count,
+      }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
 
@@ -187,7 +193,6 @@ export default function AnalyticsPage() {
     return {
       strengthDistribution,
       securityScore,
-      avgAge,
       categoryData,
       securityOverview,
       stats: {
@@ -198,7 +203,7 @@ export default function AnalyticsPage() {
         strong: strongCount,
       },
     };
-  }, [passwords]);
+  }, [passwords, categoryNameMap]);
 
   return (
     <DashboardWrapper>
@@ -216,8 +221,8 @@ export default function AnalyticsPage() {
         {/* Loading State */}
         {isPending ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
                 <Skeleton key={i} className="h-32" />
               ))}
             </div>
@@ -244,7 +249,7 @@ export default function AnalyticsPage() {
         ) : (
           <>
             {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <MetricCard
                 title="Security Score"
                 value={`${analytics.securityScore}%`}
@@ -313,13 +318,6 @@ export default function AnalyticsPage() {
                     </Link>
                   </Button>
                 }
-              />
-
-              <MetricCard
-                title="Average Age"
-                value={`${analytics.avgAge}d`}
-                icon={<Clock className="h-5 w-5" />}
-                description="Since last update"
               />
             </div>
 

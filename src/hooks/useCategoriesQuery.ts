@@ -48,6 +48,26 @@ async function deleteCategoryApi(id: string) {
   }
 }
 
+async function updateCategoryApi(
+  id: string,
+  data: Partial<CategoryInput>,
+): Promise<Category> {
+  const response = await fetch(`/api/vault/categories/${id}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const json = await response.json();
+    throw new Error(json.error?.message || "Failed to update category");
+  }
+
+  const json = await response.json();
+  return json.data as Category;
+}
+
 export function useCategoriesQuery() {
   const queryClient = useQueryClient();
 
@@ -71,6 +91,14 @@ export function useCategoriesQuery() {
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CategoryInput> }) =>
+      updateCategoryApi(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+
   return {
     categories: categoriesQuery.data ?? [],
     isLoading: categoriesQuery.isLoading,
@@ -88,6 +116,11 @@ export function useCategoriesQuery() {
     deleteCategory: deleteMutation.mutateAsync,
     isDeleting: deleteMutation.isPending,
     deleteError: deleteMutation.error,
+
+    updateCategory: (id: string, data: Partial<CategoryInput>) =>
+      updateMutation.mutateAsync({ id, data }),
+    isUpdating: updateMutation.isPending,
+    updateError: updateMutation.error,
   };
 }
 

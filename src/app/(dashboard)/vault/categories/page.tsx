@@ -104,6 +104,8 @@ export default function CategoriesPage() {
     createCategory,
     isCreating,
     deleteCategory,
+    updateCategory,
+    isUpdating,
   } = useCategoriesQuery();
 
   // UI State
@@ -116,6 +118,12 @@ export default function CategoriesPage() {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryIcon, setNewCategoryIcon] = useState("folder");
   const [newCategoryColor, setNewCategoryColor] = useState("#6b7280");
+
+  // Edit modal state
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editCategoryName, setEditCategoryName] = useState("");
+  const [editCategoryIcon, setEditCategoryIcon] = useState("folder");
+  const [editCategoryColor, setEditCategoryColor] = useState("#6b7280");
 
   // We'll call createCategory / deleteCategory from the hook and show toasts
 
@@ -179,8 +187,9 @@ export default function CategoriesPage() {
     id: string,
     name: string,
     isLocked: boolean,
+    isDefault: boolean,
   ) => {
-    if (isLocked) {
+    if (isLocked || isDefault) {
       addToast({
         type: "error",
         title: "Cannot delete",
@@ -209,6 +218,46 @@ export default function CategoriesPage() {
       .catch((err: unknown) => {
         const message = (err as Error)?.message || "Failed to delete";
         addToast({ type: "error", title: "Failed to delete", message });
+      });
+  };
+
+  const handleEditCategory = (category: Category) => {
+    setEditingCategory(category);
+    setEditCategoryName(category.name);
+    setEditCategoryIcon(category.icon);
+    setEditCategoryColor(category.color);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingCategory || !editCategoryName.trim()) {
+      addToast({
+        type: "error",
+        title: "Name required",
+        message: "Please enter a category name",
+      });
+      return;
+    }
+
+    updateCategory(editingCategory._id, {
+      name: editCategoryName.trim(),
+      icon: editCategoryIcon,
+      color: editCategoryColor,
+    })
+      .then(() => {
+        setEditingCategory(null);
+        addToast({
+          type: "success",
+          title: "Category updated",
+          message: "Your category has been updated successfully",
+        });
+      })
+      .catch((err: unknown) => {
+        const message = (err as Error)?.message || "Failed to update category";
+        addToast({
+          type: "error",
+          title: "Failed to update",
+          message,
+        });
       });
   };
 
@@ -437,7 +486,7 @@ export default function CategoriesPage() {
                       </Link>
 
                       {/* Actions */}
-                      {!category.isLocked && (
+                      {!category.isLocked && !category.isDefault && (
                         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -449,7 +498,10 @@ export default function CategoriesPage() {
                               align="end"
                               className="rounded-lg"
                             >
-                              <DropdownMenuItem className="rounded-md">
+                              <DropdownMenuItem
+                                onClick={() => handleEditCategory(category)}
+                                className="rounded-md"
+                              >
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit
                               </DropdownMenuItem>
@@ -459,6 +511,7 @@ export default function CategoriesPage() {
                                     category._id,
                                     category.name,
                                     category.isLocked,
+                                    category.isDefault,
                                   )
                                 }
                                 className="text-destructive focus:text-destructive rounded-md"
@@ -522,7 +575,7 @@ export default function CategoriesPage() {
                       </Link>
 
                       {/* Actions */}
-                      {!category.isLocked && (
+                      {!category.isLocked && !category.isDefault && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <button className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all shrink-0">
@@ -533,7 +586,10 @@ export default function CategoriesPage() {
                             align="end"
                             className="rounded-lg"
                           >
-                            <DropdownMenuItem className="rounded-md">
+                            <DropdownMenuItem
+                              onClick={() => handleEditCategory(category)}
+                              className="rounded-md"
+                            >
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
@@ -543,6 +599,7 @@ export default function CategoriesPage() {
                                   category._id,
                                   category.name,
                                   category.isLocked,
+                                  category.isDefault,
                                 )
                               }
                               className="text-destructive focus:text-destructive rounded-md"
@@ -645,6 +702,95 @@ export default function CategoriesPage() {
                       isLoading={isCreating}
                     >
                       Create Category
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Edit Category Modal */}
+            {editingCategory && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                <div className="bg-card rounded-xl border p-6 w-full max-w-md mx-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-foreground">
+                      Edit Category
+                    </h2>
+                    <button
+                      onClick={() => setEditingCategory(null)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <Input
+                      label="Category Name"
+                      placeholder="e.g., Social Media, Banking"
+                      value={editCategoryName}
+                      onChange={(e) => setEditCategoryName(e.target.value)}
+                    />
+
+                    {/* Icon Selection */}
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Icon
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {availableIcons.map((icon) => {
+                          const Icon = iconMap[icon];
+                          return (
+                            <button
+                              key={icon}
+                              onClick={() => setEditCategoryIcon(icon)}
+                              className={cn(
+                                "p-2 rounded-lg border transition-colors",
+                                editCategoryIcon === icon
+                                  ? "border-primary bg-primary/10"
+                                  : "border-transparent bg-muted hover:bg-accent",
+                              )}
+                            >
+                              <Icon className="h-5 w-5 text-foreground" />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Color Selection */}
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Color
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {colorOptions.map((color) => (
+                          <button
+                            key={color.value}
+                            onClick={() => setEditCategoryColor(color.value)}
+                            className={cn(
+                              "h-8 w-8 rounded-full border-2 transition-all",
+                              editCategoryColor === color.value
+                                ? "border-foreground scale-110"
+                                : "border-transparent hover:scale-105",
+                            )}
+                            style={{ backgroundColor: color.value }}
+                            title={color.name}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setEditingCategory(null)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button onClick={handleSaveEdit} isLoading={isUpdating}>
+                      Save Changes
                     </Button>
                   </div>
                 </div>

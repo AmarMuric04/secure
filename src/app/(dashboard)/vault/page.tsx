@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useLocalStorage } from "usehooks-ts";
-import { usePasswordsQuery } from "@/hooks";
+import { usePasswordsQuery, useCategoriesQuery } from "@/hooks";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import {
   Button,
@@ -56,6 +57,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
+  FolderOpen,
 } from "lucide-react";
 
 type ViewMode = "grid" | "list";
@@ -66,6 +68,8 @@ const ITEMS_PER_PAGE = 10;
 
 export default function VaultPage() {
   const { addToast } = useToast();
+  const searchParams = useSearchParams();
+  const categoryFilterFromUrl = searchParams.get("category");
   const {
     passwords,
     favorites,
@@ -77,6 +81,7 @@ export default function VaultPage() {
     deletePassword,
     toggleFavorite,
   } = usePasswordsQuery();
+  const { categories } = useCategoriesQuery();
 
   // UI State
   const [searchQuery, setSearchQuery] = useState("");
@@ -92,11 +97,26 @@ export default function VaultPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [showWeakOnly, setShowWeakOnly] = useState(false);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    categoryFilterFromUrl,
+  );
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Get current category name for display in filter
+  const selectedCategoryName = useMemo(() => {
+    if (!selectedCategoryId) return null;
+    const category = categories.find((c) => c._id === selectedCategoryId);
+    return category?.name ?? null;
+  }, [selectedCategoryId, categories]);
 
   // Filter and sort passwords
   const filteredPasswords = useMemo(() => {
     let result = [...passwords];
+
+    // Category filter
+    if (selectedCategoryId) {
+      result = result.filter((p) => p.categoryId === selectedCategoryId);
+    }
 
     // Search filter
     if (searchQuery) {
@@ -153,6 +173,7 @@ export default function VaultPage() {
     sortOrder,
     showWeakOnly,
     showFavoritesOnly,
+    selectedCategoryId,
   ]);
 
   // Pagination
@@ -434,6 +455,60 @@ export default function VaultPage() {
 
               {/* Controls */}
               <div className="flex items-center gap-2">
+                {/* Category filter */}
+                <div className="flex items-center">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant={selectedCategoryId ? "default" : "outline"}
+                        size="sm"
+                        className={cn(
+                          "rounded-2xl h-11 px-4",
+                          selectedCategoryId && "rounded-r-none pr-2",
+                        )}
+                      >
+                        <FolderOpen className="h-4 w-4 mr-2" />
+                        {selectedCategoryName || "Category"}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="rounded-md w-48"
+                    >
+                      <DropdownMenuItem
+                        onClick={() => setSelectedCategoryId(null)}
+                      >
+                        <span className="flex-1">All Categories</span>
+                        {!selectedCategoryId && (
+                          <Check className="h-4 w-4 ml-2" />
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      {categories.map((cat) => (
+                        <DropdownMenuItem
+                          key={cat._id}
+                          onClick={() => setSelectedCategoryId(cat._id)}
+                        >
+                          <span className="flex-1">{cat.name}</span>
+                          {selectedCategoryId === cat._id && (
+                            <Check className="h-4 w-4 ml-2" />
+                          )}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  {selectedCategoryId && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => setSelectedCategoryId(null)}
+                      className="rounded-l-none rounded-r-2xl h-11 px-2 border-l border-primary-foreground/20"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+
                 {/* Favorites filter */}
                 <Tooltip>
                   <TooltipTrigger asChild>

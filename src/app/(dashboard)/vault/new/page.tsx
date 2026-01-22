@@ -2,9 +2,18 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Input, Checkbox } from "@/components/ui";
+import {
+  Button,
+  Input,
+  Checkbox,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
-import { usePasswordsQuery } from "@/hooks";
+import { usePasswordsQuery, useCategoriesQuery } from "@/hooks";
 import { cn } from "@/lib/utils";
 import {
   RefreshCw,
@@ -12,7 +21,7 @@ import {
   Eye,
   EyeOff,
   Star,
-  Tag,
+  FolderOpen,
   Zap,
   Lock,
 } from "lucide-react";
@@ -27,6 +36,7 @@ export default function NewPasswordPage() {
     analyzeStrength,
     isCreating,
   } = usePasswordsQuery();
+  const { categories } = useCategoriesQuery();
 
   const [title, setTitle] = useState("");
   const [username, setUsername] = useState("");
@@ -35,8 +45,7 @@ export default function NewPasswordPage() {
   const [notes, setNotes] = useState("");
   const [favorite, setFavorite] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
+  const [categoryId, setCategoryId] = useState("");
 
   // Password generation options
   const [genLength, setGenLength] = useState(20);
@@ -87,17 +96,6 @@ export default function NewPasswordPage() {
     });
   };
 
-  const handleAddTag = () => {
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
-      setTagInput("");
-    }
-  };
-
-  const handleRemoveTag = (tag: string) => {
-    setTags(tags.filter((t) => t !== tag));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -117,7 +115,8 @@ export default function NewPasswordPage() {
         password,
         url: url || undefined,
         notes: notes || undefined,
-        tags,
+        categoryId: categoryId || undefined,
+        tags: [],
         favorite,
       });
 
@@ -356,11 +355,36 @@ export default function NewPasswordPage() {
         <div className="bg-card rounded-3xl border shadow-sm p-8 space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2.5 bg-primary/10 rounded-2xl">
-              <Tag className="h-5 w-5 text-primary" />
+              <FolderOpen className="h-5 w-5 text-primary" />
             </div>
             <h2 className="text-xl font-semibold text-foreground">
               Additional Details
             </h2>
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Category
+            </label>
+            <Select
+              value={categoryId || "none"}
+              onValueChange={(value) =>
+                setCategoryId(value === "none" ? "" : value)
+              }
+            >
+              <SelectTrigger className="w-full h-11 rounded-2xl">
+                <SelectValue placeholder="No Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No Category</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
@@ -374,51 +398,6 @@ export default function NewPasswordPage() {
               rows={4}
               className="w-full px-4 py-3 border border-input rounded-2xl bg-transparent focus:outline-none focus-visible:border-primary focus-visible:ring-primary/20 focus-visible:ring-[3px] resize-none transition-all"
             />
-          </div>
-
-          {/* Tags */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Tags
-            </label>
-            <div className="flex gap-2 mb-3 flex-wrap">
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-xl text-sm font-medium"
-                >
-                  <Tag className="h-3 w-3" />
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveTag(tag)}
-                    className="ml-1 hover:text-primary/70 transition-colors"
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-            <div className="flex gap-3">
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) =>
-                  e.key === "Enter" && (e.preventDefault(), handleAddTag())
-                }
-                placeholder="Add a tag..."
-                className="flex-1 h-11 px-4 py-2 border border-input rounded-2xl bg-transparent focus:outline-none focus-visible:border-primary focus-visible:ring-primary/20 focus-visible:ring-[3px] text-sm transition-all"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleAddTag}
-                className="rounded-2xl"
-              >
-                Add
-              </Button>
-            </div>
           </div>
 
           {/* Favorite */}

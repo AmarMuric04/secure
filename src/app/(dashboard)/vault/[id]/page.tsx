@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -19,6 +19,7 @@ import {
   Lock,
   FileText,
   Check,
+  FolderOpen,
 } from "lucide-react";
 import {
   Button,
@@ -27,7 +28,7 @@ import {
   DashboardWrapper,
   EmptyState,
 } from "@/components/ui";
-import { usePasswordsQuery } from "@/hooks";
+import { usePasswordsQuery, useCategoriesQuery } from "@/hooks";
 import { formatRelativeTime, getFaviconUrl } from "@/lib/utils";
 
 export default function PasswordDetailPage() {
@@ -40,6 +41,7 @@ export default function PasswordDetailPage() {
     deletePassword,
     isDeleting: deleteLoading,
   } = usePasswordsQuery();
+  const { categories } = useCategoriesQuery();
 
   const [showPassword, setShowPassword] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -47,6 +49,13 @@ export default function PasswordDetailPage() {
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
 
   const password = passwords.find((p) => p._id === id) ?? null;
+
+  // Get category name from categoryId
+  const categoryName = useMemo(() => {
+    if (!password?.categoryId) return null;
+    const category = categories.find((c) => c._id === password.categoryId);
+    return category?.name ?? null;
+  }, [password?.categoryId, categories]);
 
   const handleCopy = async (text: string, field: string) => {
     await navigator.clipboard.writeText(text);
@@ -332,19 +341,22 @@ export default function PasswordDetailPage() {
           )}
 
           {/* Category */}
-          {password.categoryId && (
+          {password.categoryId && categoryName && (
             <div className="border-b border-border p-6 hover:bg-muted/30 transition-colors">
               <div className="flex items-center gap-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
-                  <div className="h-2 w-2 rounded-full bg-primary" />
+                  <FolderOpen className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground font-medium mb-1">
                     Category
                   </p>
-                  <span className="inline-block rounded-2xl bg-primary/10 px-4 py-1.5 text-sm text-primary font-medium">
-                    {password.categoryId}
-                  </span>
+                  <Link
+                    href={`/vault?category=${password.categoryId}`}
+                    className="inline-block rounded-2xl bg-primary/10 px-4 py-1.5 text-sm text-primary font-medium hover:bg-primary/20 transition-colors"
+                  >
+                    {categoryName}
+                  </Link>
                 </div>
               </div>
             </div>
