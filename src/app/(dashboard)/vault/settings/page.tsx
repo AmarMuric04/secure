@@ -17,31 +17,41 @@ import {
 import { Button } from "@/components/ui/Button";
 import { DashboardWrapper } from "@/components/ui/DashboardWrapper";
 import { Modal } from "@/components/ui/Modal";
-import { useVaultStore } from "@/stores";
+import { usePasswordsQuery, useCategoriesQuery } from "@/hooks";
 
 export default function SettingsPage() {
-  const { passwords, encryptionKey } = useVaultStore();
+  const { passwords } = usePasswordsQuery();
+  const { categories } = useCategoriesQuery();
 
   // Export modal state
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportFormat, setExportFormat] = useState<"json" | "csv">("json");
   const [isExporting, setIsExporting] = useState(false);
 
+  // Create category name lookup
+  const categoryNameMap = categories.reduce(
+    (acc, cat) => {
+      acc[cat._id] = cat.name;
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+
   const handleExport = useCallback(async () => {
-    if (!encryptionKey) {
-      alert("Encryption key not available. Please try again.");
+    if (passwords.length === 0) {
+      alert("No passwords to export.");
       return;
     }
 
     setIsExporting(true);
     try {
-      const decryptedPasswords = passwords.map((p) => ({
+      const exportData = passwords.map((p) => ({
         title: p.title,
         username: p.username || "",
-        password: p.password || "[Unable to decrypt]",
+        password: p.password || "",
         url: p.url || "",
         notes: p.notes || "",
-        categoryId: p.categoryId || "",
+        category: p.categoryId ? categoryNameMap[p.categoryId] || "" : "",
         favorite: p.favorite,
         createdAt: p.createdAt,
         updatedAt: p.updatedAt,
@@ -52,7 +62,7 @@ export default function SettingsPage() {
       let filename: string;
 
       if (exportFormat === "json") {
-        content = JSON.stringify(decryptedPasswords, null, 2);
+        content = JSON.stringify(exportData, null, 2);
         mimeType = "application/json";
         filename = `vault-export-${new Date().toISOString().split("T")[0]}.json`;
       } else {
@@ -62,18 +72,18 @@ export default function SettingsPage() {
           "Password",
           "URL",
           "Notes",
-          "Category ID",
+          "Category",
           "Favorite",
           "Created At",
           "Updated At",
         ];
-        const rows = decryptedPasswords.map((p) => [
+        const rows = exportData.map((p) => [
           p.title,
           p.username,
           p.password,
           p.url,
           p.notes,
-          p.categoryId,
+          p.category,
           p.favorite ? "Yes" : "No",
           String(p.createdAt),
           String(p.updatedAt),
@@ -115,7 +125,7 @@ export default function SettingsPage() {
     } finally {
       setIsExporting(false);
     }
-  }, [encryptionKey, passwords, exportFormat]);
+  }, [passwords, exportFormat, categoryNameMap]);
 
   const handleSignOut = useCallback(async () => {
     await signOut({ callbackUrl: "/login" });
