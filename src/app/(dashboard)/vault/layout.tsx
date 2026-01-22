@@ -11,8 +11,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { Lock } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 
 export default function VaultLayout({
   children,
@@ -21,7 +19,7 @@ export default function VaultLayout({
 }) {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [keyMissing, setKeyMissing] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const { encryptionKey, setEncryptionKey } = useVaultStore();
 
@@ -43,7 +41,7 @@ export default function VaultLayout({
               ["encrypt", "decrypt"],
             );
             setEncryptionKey(key);
-            setKeyMissing(false);
+            setIsInitialized(true);
             return;
           } catch (error) {
             console.error("[VaultLayout] Failed to import key:", error);
@@ -53,7 +51,7 @@ export default function VaultLayout({
 
         // No stored key found
         // For OAuth users: generate a new random key (they don't have password-derived keys)
-        // For credential users: they need to re-login to derive their key
+        // For credential users: auto-logout and redirect to login to derive key from password
         const isOAuthUser = session?.user?.provider === "google";
 
         if (isOAuthUser) {
@@ -66,26 +64,23 @@ export default function VaultLayout({
           const exportedKey = await crypto.subtle.exportKey("jwk", newKey);
           sessionStorage.setItem("vault_key", JSON.stringify(exportedKey));
           setEncryptionKey(newKey);
-          setKeyMissing(false);
+          setIsInitialized(true);
         } else {
-          // Credential users need to re-login to derive their encryption key
-          // Their passwords are encrypted with a key derived from their master password
+          // Credential users: encryption key is lost, must re-login to derive it
           console.warn(
-            "[VaultLayout] Encryption key missing for credential user - re-login required",
+            "[VaultLayout] Encryption key missing for credential user - forcing re-login",
           );
-          setKeyMissing(true);
+          await signOut({ redirect: false });
+          router.push("/login?reason=session_expired");
+          return;
         }
+      } else if (status === "authenticated" && encryptionKey) {
+        setIsInitialized(true);
       }
     };
 
     initializeVaultKey();
-  }, [status, session, encryptionKey, setEncryptionKey]);
-
-  // Handle re-login for credential users
-  const handleReLogin = async () => {
-    await signOut({ redirect: false });
-    router.push("/login");
-  };
+  }, [status, session, encryptionKey, setEncryptionKey, router]);
 
   // Redirect to login if not authenticated
   if (status === "unauthenticated") {
@@ -93,30 +88,12 @@ export default function VaultLayout({
     return null;
   }
 
-  // Show locked screen if encryption key is missing for credential users
-  if (keyMissing && status === "authenticated") {
+  // Show loading while initializing
+  if (status === "loading" || (status === "authenticated" && !isInitialized)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
-        <div className="max-w-md w-full text-center space-y-6">
-          <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mx-auto">
-            <Lock className="w-8 h-8 text-amber-600 dark:text-amber-400" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Session Expired
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Your vault encryption key has expired. Please log in again to
-              decrypt your passwords.
-            </p>
-          </div>
-          <Button onClick={handleReLogin} size="lg" className="w-full">
-            Log In Again
-          </Button>
-          <p className="text-sm text-gray-500 dark:text-gray-500">
-            This happens when your browser session ends or you&apos;ve been away
-            for a while.
-          </p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <div className="animate-pulse text-gray-500 dark:text-gray-400">
+          Unlocking vault...
         </div>
       </div>
     );

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -56,6 +56,18 @@ function LoginContent() {
 
   // Check for MFA redirect
   const mfaRequired = searchParams.get("mfa") === "required";
+  const sessionExpired = searchParams.get("reason") === "session_expired";
+
+  // Show toast if session expired
+  useEffect(() => {
+    if (sessionExpired) {
+      addToast({
+        type: "info",
+        title: "Session expired",
+        message: "Please log in again to access your vault",
+      });
+    }
+  }, [sessionExpired, addToast]);
 
   const handleCredentialsLogin = async (e: React.FormEvent) => {
     e.preventDefault();
