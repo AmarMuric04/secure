@@ -2,9 +2,10 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { useLocalStorage } from "usehooks-ts";
 import { usePasswordsQuery, useCategoriesQuery } from "@/hooks";
 import { cn } from "@/lib/utils";
-import { Button, Input, Skeleton, DashboardWrapper } from "@/components/ui";
+import { Button, Input, Skeleton, DashboardWrapper, EmptyState } from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
 import {
   Tooltip,
@@ -100,7 +101,10 @@ export default function CategoriesPage() {
   } = useCategoriesQuery();
 
   // UI State
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useLocalStorage<ViewMode>(
+    "categories-view-mode",
+    "grid",
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -368,30 +372,26 @@ export default function CategoriesPage() {
 
             {/* Categories Grid/List */}
             {filteredCategories.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 gap-4">
-                <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-                  <FolderOpen className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <div className="text-center">
-                  <h2 className="text-lg font-semibold text-foreground">
-                    {searchQuery ? "No categories found" : "No categories yet"}
-                  </h2>
-                  <p className="text-muted-foreground mt-1">
-                    {searchQuery
-                      ? "Try adjusting your search"
-                      : "Create your first category to organize passwords"}
-                  </p>
-                </div>
-                {!searchQuery && (
-                  <Button
-                    onClick={() => setShowCreateModal(true)}
-                    className="rounded-2xl"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Category
-                  </Button>
-                )}
-              </div>
+              <EmptyState
+                icon={<FolderOpen className="h-8 w-8 text-muted-foreground" />}
+                title={searchQuery ? "No categories found" : "No categories yet"}
+                description={
+                  searchQuery
+                    ? "Try adjusting your search"
+                    : "Create your first category to organize passwords"
+                }
+                action={
+                  !searchQuery ? (
+                    <Button
+                      onClick={() => setShowCreateModal(true)}
+                      className="rounded-2xl"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Category
+                    </Button>
+                  ) : undefined
+                }
+              />
             ) : viewMode === "grid" ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filteredCategories.map((category) => {

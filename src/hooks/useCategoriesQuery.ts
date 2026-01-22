@@ -90,3 +90,20 @@ export function useCategoriesQuery() {
     deleteError: deleteMutation.error,
   };
 }
+
+/**
+ * Hook to prefetch categories on hover for faster navigation
+ */
+export function usePrefetchCategories() {
+  const queryClient = useQueryClient();
+
+  return {
+    prefetch: async () => {
+      await queryClient.prefetchQuery({
+        queryKey: ["categories"],
+        queryFn: fetchCategories,
+        staleTime: 5 * 60 * 1000,
+      });
+    },
+  };
+}

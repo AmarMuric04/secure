@@ -14,6 +14,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  EmptyState,
 } from "@/components/ui";
 import { usePasswordsQuery, useCategoriesQuery } from "@/hooks";
 import { cn } from "@/lib/utils";
@@ -256,9 +257,11 @@ function EditForm({
               <label className="block text-sm font-medium text-foreground mb-2">
                 Category
               </label>
-              <Select 
-                value={categoryId || "none"} 
-                onValueChange={(value) => setCategoryId(value === "none" ? "" : value)}
+              <Select
+                value={categoryId || "none"}
+                onValueChange={(value) =>
+                  setCategoryId(value === "none" ? "" : value)
+                }
               >
                 <SelectTrigger className="w-full h-11 rounded-2xl">
                   <SelectValue placeholder="No Category" />
@@ -344,22 +347,18 @@ export default function EditPasswordPage() {
   if (!existingPassword) {
     return (
       <DashboardWrapper>
-        <div className="flex flex-col items-center justify-center h-64 gap-4">
-          <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-            <Lock className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <div className="text-center">
-            <h2 className="text-lg font-semibold text-foreground">
-              Password not found
-            </h2>
-            <p className="text-muted-foreground mt-1">
-              This password may have been deleted
-            </p>
-          </div>
-          <Link href="/vault">
-            <Button variant="secondary">Back to Vault</Button>
-          </Link>
-        </div>
+        <EmptyState
+          icon={<Lock className="h-8 w-8 text-muted-foreground" />}
+          title="Password not found"
+          description="This password may have been deleted"
+          action={
+            <Link href="/vault">
+              <Button variant="secondary" className="rounded-2xl">
+                Back to Vault
+              </Button>
+            </Link>
+          }
+        />
       </DashboardWrapper>
     );
   }

@@ -25,6 +25,7 @@ import {
   Spinner,
   ConfirmDialog,
   DashboardWrapper,
+  EmptyState,
 } from "@/components/ui";
 import { usePasswordsQuery } from "@/hooks";
 import { formatRelativeTime, getFaviconUrl } from "@/lib/utils";
@@ -96,22 +97,18 @@ export default function PasswordDetailPage() {
   if (!password) {
     return (
       <DashboardWrapper>
-        <div className="flex flex-col items-center justify-center h-64 gap-4">
-          <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-            <Lock className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <div className="text-center">
-            <h2 className="text-lg font-semibold text-foreground">
-              Password not found
-            </h2>
-            <p className="text-muted-foreground mt-1">
-              This password may have been deleted
-            </p>
-          </div>
-          <Link href="/vault">
-            <Button variant="secondary">Back to Vault</Button>
-          </Link>
-        </div>
+        <EmptyState
+          icon={<Lock className="h-8 w-8 text-muted-foreground" />}
+          title="Password not found"
+          description="This password may have been deleted"
+          action={
+            <Link href="/vault">
+              <Button variant="secondary" className="rounded-2xl">
+                Back to Vault
+              </Button>
+            </Link>
+          }
+        />
       </DashboardWrapper>
     );
   }
@@ -186,9 +183,9 @@ export default function PasswordDetailPage() {
               </Button>
             </Link>
             <Button
-              variant="danger"
+              variant="outline"
               onClick={() => setShowDeleteConfirm(true)}
-              className="gap-2 rounded-2xl"
+              className="gap-2 rounded-2xl text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-950/20"
             >
               <Trash2 className="h-4 w-4" />
               Delete

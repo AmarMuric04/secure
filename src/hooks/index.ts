@@ -6,4 +6,7 @@ export {
   usePrefetchPasswords,
   passwordKeys,
 } from "./usePasswordsQuery";
-export { useCategoriesQuery } from "./useCategoriesQuery";
+export {
+  useCategoriesQuery,
+  usePrefetchCategories,
+} from "./useCategoriesQuery";

@@ -12,16 +12,19 @@ import {
   Trash2,
   Settings,
   Plus,
-  Search,
+  ShieldAlert,
+  BarChart3,
 } from "lucide-react";
 
 import { NavUser } from "@/components/nav-user";
+import { usePrefetchPasswords, usePrefetchCategories } from "@/hooks";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -29,22 +32,31 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 
-const navigation = [
+const vaultNavigation = [
   { name: "All Passwords", href: "/vault", icon: Key },
   { name: "Favorites", href: "/vault/favorites", icon: Star },
   { name: "Categories", href: "/vault/categories", icon: Folder },
+];
+
+const securityNavigation = [
+  { name: "Security", href: "/vault/security", icon: ShieldAlert },
+  { name: "Analytics", href: "/vault/analytics", icon: BarChart3 },
+];
+
+const organizationNavigation = [
   { name: "Trash", href: "/vault/trash", icon: Trash2 },
 ];
 
-const secondaryNavigation = [
+const settingsNavigation = [
   { name: "Settings", href: "/vault/settings", icon: Settings },
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { prefetch } = usePrefetchPasswords();
+  const { prefetch: prefetchCategories } = usePrefetchCategories();
 
   const user = session?.user;
 
@@ -71,24 +83,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Search */}
-        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-          <SidebarGroupContent>
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search vault..."
-                className="pl-8"
-              />
-            </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
         {/* Add Password Button */}
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
           <SidebarGroupContent>
-            <Button asChild className="w-full">
+            <Button asChild className="w-full rounded-xl">
               <Link href="/vault/new">
                 <Plus className="mr-2 h-4 w-4" />
                 Add Password
@@ -97,11 +95,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Main Navigation */}
+        {/* Vault Section */}
         <SidebarGroup>
+          <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+            Vault
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigation.map((item) => {
+              {vaultNavigation.map((item) => {
                 const isActive =
                   pathname === item.href ||
                   (item.href === "/vault" && pathname === "/vault");
@@ -111,6 +112,80 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       asChild
                       isActive={isActive}
                       tooltip={item.name}
+                      onMouseEnter={() => {
+                        if (item.href === "/vault/categories") {
+                          prefetchCategories();
+                          prefetch();
+                        } else if (item.href === "/vault/favorites") {
+                          prefetch({ favorite: true });
+                        } else {
+                          prefetch();
+                        }
+                      }}
+                    >
+                      <Link href={item.href}>
+                        <item.icon />
+                        <span>{item.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Security & Insights Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+            Security & Insights
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {securityNavigation.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={item.name}
+                      onMouseEnter={() => {
+                        prefetch();
+                      }}
+                    >
+                      <Link href={item.href}>
+                        <item.icon />
+                        <span>{item.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Organization Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+            Organization
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {organizationNavigation.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={item.name}
+                      onMouseEnter={() => {
+                        if (item.href === "/vault/trash") {
+                          prefetch({ includeDeleted: true });
+                        }
+                      }}
                     >
                       <Link href={item.href}>
                         <item.icon />
@@ -128,7 +203,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup className="mt-auto">
           <SidebarGroupContent>
             <SidebarMenu>
-              {secondaryNavigation.map((item) => {
+              {settingsNavigation.map((item) => {
                 const isActive = pathname === item.href;
                 return (
                   <SidebarMenuItem key={item.name}>

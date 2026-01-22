@@ -202,7 +202,8 @@ export type AuditAction =
   | "export_requested"
   | "settings_changed"
   | "recovery_key_viewed"
-  | "session_revoked";
+  | "session_revoked"
+  | "account_deleted";
 
 export interface AuditLog {
   _id: string;

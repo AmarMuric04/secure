@@ -144,3 +144,49 @@ export async function PUT(request: NextRequest) {
     return errorResponse("INTERNAL_ERROR", "An unexpected error occurred", 500);
   }
 }
+
+/**
+ * Delete current user's account and all associated data
+ */
+export async function DELETE(request: NextRequest) {
+  try {
+    // Authenticate request
+    const { auth, error: authError } = await authenticateRequest(request);
+
+    if (authError) {
+      return authError;
+    }
+
+    await connectDB();
+
+    // Import models for cascading delete
+    const { PasswordEntryModel, CategoryModel, SessionModel, AuditLogModel } =
+      await import("@/lib/db/models");
+
+    // Delete all user data in parallel
+    await Promise.all([
+      // Delete all passwords
+      PasswordEntryModel.deleteMany({ userId: auth.userId }),
+      // Delete all categories
+      CategoryModel.deleteMany({ userId: auth.userId }),
+      // Delete all sessions
+      SessionModel.deleteMany({ userId: auth.userId }),
+      // Delete all audit logs
+      AuditLogModel.deleteMany({ userId: auth.userId }),
+    ]);
+
+    // Log the account deletion before deleting the user
+    await logAudit(auth.userId, "account_deleted", request, {
+      resourceType: "user",
+      resourceId: auth.userId,
+    });
+
+    // Delete the user
+    await UserModel.findByIdAndDelete(auth.userId);
+
+    return successResponse({ message: "Account deleted successfully" });
+  } catch (error) {
+    console.error("Account deletion error:", error);
+    return errorResponse("INTERNAL_ERROR", "An unexpected error occurred", 500);
+  }
+}

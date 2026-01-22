@@ -138,7 +138,7 @@ export default function NewPasswordPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto pb-6">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">
@@ -447,7 +447,7 @@ export default function NewPasswordPage() {
         </div>
 
         {/* Actions */}
-        <div className="flex gap-4 sticky bottom-6 bg-background/80 backdrop-blur-sm p-4 rounded-2xl border shadow-lg">
+        <div className="flex gap-4 sticky bottom-0 bg-background pt-4 pb-2">
           <Button
             type="button"
             variant="outline"

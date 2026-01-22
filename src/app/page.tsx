@@ -1,18 +1,31 @@
+"use client";
+
+import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Shield, Lock, Key, Fingerprint, Cloud, Zap } from "lucide-react";
+import {
+  Shield,
+  Lock,
+  Key,
+  Fingerprint,
+  Cloud,
+  Zap,
+  ArrowRight,
+  Check,
+} from "lucide-react";
+import { Button } from "@/components/ui";
 
 const features = [
   {
     icon: Shield,
     title: "Zero-Knowledge Encryption",
     description:
-      "Your passwords are encrypted client-side before ever leaving your device. We never see your master password.",
+      "Your passwords are encrypted client-side. We never see your master password.",
   },
   {
     icon: Lock,
     title: "AES-256-GCM",
     description:
-      "Military-grade encryption protects your data. The same standard used by governments worldwide.",
+      "Military-grade encryption protects your data with the highest standards.",
   },
   {
     icon: Key,
@@ -24,46 +37,83 @@ const features = [
     icon: Fingerprint,
     title: "Two-Factor Authentication",
     description:
-      "Add an extra layer of security with TOTP-based two-factor authentication.",
+      "Add an extra layer of security with TOTP-based authentication.",
   },
   {
     icon: Cloud,
     title: "Secure Cloud Sync",
     description:
-      "Access your passwords from anywhere. Encrypted data syncs seamlessly across devices.",
+      "Access your passwords from anywhere with encrypted cloud sync.",
   },
   {
     icon: Zap,
     title: "Password Generator",
     description:
-      "Create strong, unique passwords for every account with our cryptographically secure generator.",
+      "Create strong, unique passwords with our cryptographic generator.",
+  },
+];
+
+const steps = [
+  {
+    number: "01",
+    title: "Create Your Account",
+    description:
+      "Sign up with your email and create a strong master password that only you know.",
+  },
+  {
+    number: "02",
+    title: "Add Your Passwords",
+    description:
+      "Securely store all your passwords, notes, and sensitive information in your vault.",
+  },
+  {
+    number: "03",
+    title: "Access Anywhere",
+    description:
+      "Your encrypted data syncs seamlessly. Only you can decrypt it with your master password.",
   },
 ];
 
 export default function Home() {
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === "authenticated" && session?.user;
+  const isLoading = status === "loading";
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-gray-800">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Shield className="h-8 w-8 text-blue-500" />
-              <span className="text-xl font-bold text-white">SecureVault</span>
-            </div>
-            <nav className="flex items-center gap-4">
-              <Link
-                href="/login"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/register"
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-              >
-                Get Started
-              </Link>
+            <Link href="/" className="flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
+                <Shield className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <span className="text-xl font-bold text-foreground">
+                SecureVault
+              </span>
+            </Link>
+
+            <nav className="flex items-center gap-3">
+              {isLoading ? (
+                <div className="h-10 w-24 animate-pulse rounded-xl bg-muted" />
+              ) : isAuthenticated ? (
+                <Link href="/vault">
+                  <Button>
+                    Open Vault
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button variant="ghost">Sign In</Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button>Get Started</Button>
+                  </Link>
+                </>
+              )}
             </nav>
           </div>
         </div>
@@ -71,76 +121,95 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="relative py-20 sm:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
               Your Passwords,{" "}
-              <span className="text-blue-500">Truly Secure</span>
+              <span className="text-primary">Truly Secure</span>
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-400">
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
               SecureVault uses zero-knowledge encryption to protect your
               passwords. Your data is encrypted before it leaves your device —
               we never see your master password.
             </p>
-            <div className="mt-10 flex items-center justify-center gap-4">
-              <Link
-                href="/register"
-                className="rounded-lg bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 transition-colors"
-              >
-                Create Free Account
-              </Link>
-              <Link
-                href="/login"
-                className="rounded-lg border border-gray-700 px-6 py-3 text-base font-medium text-gray-300 hover:border-gray-600 hover:text-white transition-colors"
-              >
-                Sign In
-              </Link>
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+              {isLoading ? (
+                <div className="h-12 w-48 animate-pulse rounded-xl bg-muted" />
+              ) : isAuthenticated ? (
+                <Link href="/vault">
+                  <Button size="lg" className="h-12 px-8 text-base">
+                    Go to Your Vault
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/register">
+                    <Button size="lg" className="h-12 px-8 text-base">
+                      Create Free Account
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      className="h-12 px-8 text-base"
+                    >
+                      Sign In
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
           {/* Trust Badges */}
-          <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-gray-500">
-            <div className="flex items-center gap-2">
-              <Lock className="h-4 w-4" />
-              <span>End-to-End Encrypted</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              <span>Zero-Knowledge Architecture</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Key className="h-4 w-4" />
-              <span>Open Security Model</span>
-            </div>
+          <div className="mt-16 flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+            {[
+              { icon: Lock, text: "End-to-End Encrypted" },
+              { icon: Shield, text: "Zero-Knowledge" },
+              { icon: Key, text: "Open Security Model" },
+            ].map((badge) => (
+              <div
+                key={badge.text}
+                className="flex items-center gap-2 text-sm text-muted-foreground"
+              >
+                <badge.icon className="h-4 w-4 text-primary" />
+                <span>{badge.text}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Features Grid */}
-      <section className="py-20 bg-gray-800/50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-20 border-t border-border">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-white">
+            <h2 className="text-3xl font-bold text-foreground">
               Security Without Compromise
             </h2>
-            <p className="mt-4 text-gray-400">
+            <p className="mt-4 text-muted-foreground">
               Built with the most advanced encryption technologies available.
             </p>
           </div>
 
-          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="rounded-xl border border-gray-700 bg-gray-800/50 p-6 hover:border-gray-600 transition-colors"
+                className="group rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/50"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10">
-                  <feature.icon className="h-6 w-6 text-blue-500" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                  <feature.icon className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-white">
+                <h3 className="mt-4 text-lg font-semibold text-foreground">
                   {feature.title}
                 </h3>
-                <p className="mt-2 text-gray-400">{feature.description}</p>
+                <p className="mt-2 text-muted-foreground">
+                  {feature.description}
+                </p>
               </div>
             ))}
           </div>
@@ -148,88 +217,87 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-20 border-t border-border bg-muted/30">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-white">
-              How Zero-Knowledge Works
-            </h2>
-            <p className="mt-4 text-gray-400">
-              Your master password never leaves your device.
+            <h2 className="text-3xl font-bold text-foreground">How It Works</h2>
+            <p className="mt-4 text-muted-foreground">
+              Get started in three simple steps.
             </p>
           </div>
 
           <div className="mt-16 grid gap-8 md:grid-cols-3">
-            <div className="text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 text-2xl font-bold text-blue-500">
-                1
+            {steps.map((step) => (
+              <div key={step.number} className="relative text-center">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-2xl font-bold text-primary-foreground">
+                  {step.number}
+                </div>
+                <h3 className="mt-6 text-lg font-semibold text-foreground">
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-muted-foreground">{step.description}</p>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-white">
-                Create Master Password
-              </h3>
-              <p className="mt-2 text-gray-400">
-                Your master password is used to derive encryption keys locally
-                on your device.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 text-2xl font-bold text-blue-500">
-                2
-              </div>
-              <h3 className="mt-4 text-lg font-semibold text-white">
-                Encrypt Everything
-              </h3>
-              <p className="mt-2 text-gray-400">
-                All your passwords are encrypted with AES-256-GCM before being
-                sent to our servers.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 text-2xl font-bold text-blue-500">
-                3
-              </div>
-              <h3 className="mt-4 text-lg font-semibold text-white">
-                Access Anywhere
-              </h3>
-              <p className="mt-2 text-gray-400">
-                Encrypted data syncs to the cloud. Only you can decrypt it with
-                your master password.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white">
-            Start Protecting Your Passwords Today
-          </h2>
-          <p className="mt-4 text-blue-100">
-            Join thousands of users who trust SecureVault with their digital
-            security.
-          </p>
-          <div className="mt-8">
-            <Link
-              href="/register"
-              className="inline-block rounded-lg bg-white px-8 py-3 text-base font-medium text-blue-600 hover:bg-gray-100 transition-colors"
-            >
-              Create Free Account
-            </Link>
+      <section className="py-20 border-t border-border">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl bg-primary p-8 sm:p-12 text-center">
+            <h2 className="text-3xl font-bold text-primary-foreground">
+              Start Protecting Your Passwords
+            </h2>
+            <p className="mt-4 text-primary-foreground/80">
+              Join thousands of users who trust SecureVault with their digital
+              security.
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+              {isAuthenticated ? (
+                <Link href="/vault">
+                  <Button
+                    size="lg"
+                    variant="secondary"
+                    className="h-12 px-8 text-base"
+                  >
+                    Open Your Vault
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/register">
+                    <Button
+                      size="lg"
+                      variant="secondary"
+                      className="h-12 px-8 text-base"
+                    >
+                      Create Free Account
+                    </Button>
+                  </Link>
+                  <div className="flex items-center gap-2 text-primary-foreground/80">
+                    <Check className="h-4 w-4" />
+                    <span className="text-sm">No credit card required</span>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <footer className="border-t border-border py-12">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center gap-2">
-              <Shield className="h-6 w-6 text-blue-500" />
-              <span className="font-semibold text-white">SecureVault</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <Shield className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <span className="font-semibold text-foreground">SecureVault</span>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} SecureVault. Your passwords, truly
               secure.
             </p>

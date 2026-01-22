@@ -2,9 +2,10 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { useLocalStorage } from "usehooks-ts";
 import { usePasswordsQuery } from "@/hooks";
 import { cn, formatRelativeTime } from "@/lib/utils";
-import { Button, Input, DashboardWrapper, Skeleton } from "@/components/ui";
+import { Button, Input, DashboardWrapper, Skeleton, EmptyState } from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
 import {
   Tooltip,
@@ -18,6 +19,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import type { DecryptedPasswordEntry } from "@/stores";
 import {
   Key,
@@ -43,6 +49,7 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 
 type ViewMode = "grid" | "list";
@@ -67,7 +74,14 @@ export default function VaultPage() {
 
   // UI State
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [viewMode, setViewMode] = useLocalStorage<ViewMode>(
+    "vault-view-mode",
+    "list",
+  );
+  const [quickAccessOpen, setQuickAccessOpen] = useLocalStorage<boolean>(
+    "vault-quick-access-open",
+    true,
+  );
   const [sortField, setSortField] = useState<SortField>("updatedAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [showWeakOnly, setShowWeakOnly] = useState(false);
@@ -310,19 +324,19 @@ export default function VaultPage() {
 
         {/* Empty State */}
         {!isPending && !isError && passwords.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-64 gap-4">
-            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-              <Key className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <div className="text-center">
-              <h2 className="text-lg font-semibold text-foreground">
-                No passwords yet
-              </h2>
-              <p className="text-muted-foreground mt-1">
-                Add your first password to get started with SecureVault
-              </p>
-            </div>
-          </div>
+          <EmptyState
+            icon={<Key className="h-8 w-8 text-muted-foreground" />}
+            title="No passwords yet"
+            description="Add your first password to get started with SecureVault"
+            action={
+              <Button asChild className="rounded-2xl">
+                <Link href="/vault/new">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Password
+                </Link>
+              </Button>
+            }
+          />
         )}
 
         {/* Data loaded successfully */}
@@ -454,7 +468,7 @@ export default function VaultPage() {
                       Sort
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="rounded-2xl">
+                  <DropdownMenuContent align="end" className="rounded-md">
                     <DropdownMenuItem onClick={() => toggleSort("title")}>
                       <span className="flex-1">Name</span>
                       {sortField === "title" && (
@@ -548,30 +562,48 @@ export default function VaultPage() {
 
             {/* Quick Access - Favorites */}
             {favorites.length > 0 && !showFavoritesOnly && !searchQuery && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-                    <h2 className="text-lg font-semibold text-foreground">
-                      Quick Access
-                    </h2>
-                  </div>
-                  <div className="flex-1 h-px bg-border" />
+              <Collapsible
+                open={quickAccessOpen}
+                onOpenChange={setQuickAccessOpen}
+              >
+                <div className="space-y-4">
+                  <CollapsibleTrigger asChild>
+                    <button className="flex items-center gap-3 w-full group">
+                      <div className="flex items-center gap-2">
+                        <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                        <h2 className="text-lg font-semibold text-foreground">
+                          Quick Access
+                        </h2>
+                        <span className="text-sm text-muted-foreground">
+                          ({favorites.length > 4 ? "4+" : favorites.length})
+                        </span>
+                      </div>
+                      <div className="flex-1 h-px bg-border" />
+                      <ChevronDown
+                        className={cn(
+                          "h-5 w-5 text-muted-foreground transition-transform duration-200",
+                          quickAccessOpen && "rotate-180",
+                        )}
+                      />
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-2">
+                      {favorites.slice(0, 4).map((entry) => (
+                        <PasswordCard
+                          key={entry._id}
+                          entry={entry}
+                          compact
+                          onCopyPassword={handleCopyPassword}
+                          onCopyUsername={handleCopyUsername}
+                          onDelete={handleDelete}
+                          onToggleFavorite={toggleFavorite}
+                        />
+                      ))}
+                    </div>
+                  </CollapsibleContent>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {favorites.slice(0, 4).map((entry) => (
-                    <PasswordCard
-                      key={entry._id}
-                      entry={entry}
-                      compact
-                      onCopyPassword={handleCopyPassword}
-                      onCopyUsername={handleCopyUsername}
-                      onDelete={handleDelete}
-                      onToggleFavorite={toggleFavorite}
-                    />
-                  ))}
-                </div>
-              </div>
+              </Collapsible>
             )}
 
             {/* All Passwords Section Title */}
@@ -615,32 +647,26 @@ export default function VaultPage() {
 
             {/* Password List/Grid */}
             {filteredPasswords.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 gap-4">
-                <div className="h-16 w-16 rounded-3xl bg-muted flex items-center justify-center">
-                  <Search className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <div className="text-center">
-                  <p className="font-semibold text-lg text-foreground">
-                    No matches found
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Try adjusting your search or filters
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setShowWeakOnly(false);
-                    setShowFavoritesOnly(false);
-                    setCurrentPage(1);
-                  }}
-                  className="rounded-2xl"
-                >
-                  Clear filters
-                </Button>
-              </div>
+              <EmptyState
+                icon={<Search className="h-8 w-8 text-muted-foreground" />}
+                title="No matches found"
+                description="Try adjusting your search or filters"
+                action={
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setShowWeakOnly(false);
+                      setShowFavoritesOnly(false);
+                      setCurrentPage(1);
+                    }}
+                    className="rounded-2xl"
+                  >
+                    Clear filters
+                  </Button>
+                }
+              />
             ) : (
               <>
                 {viewMode === "grid" ? (
@@ -881,7 +907,7 @@ function PasswordCard({
                 <MoreVertical className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-2xl">
+            <DropdownMenuContent align="end" className="rounded-lg">
               <DropdownMenuItem onClick={() => onToggleFavorite(entry._id)}>
                 <Star
                   className={cn(
@@ -1084,7 +1110,7 @@ function PasswordCard({
               <MoreVertical className="h-4 w-4" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="rounded-2xl">
+          <DropdownMenuContent align="end" className="rounded-lg">
             <DropdownMenuItem onClick={() => onToggleFavorite(entry._id)}>
               <Star
                 className={cn(

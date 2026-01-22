@@ -1,148 +1,167 @@
 "use client";
 
-import { useState } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useState, useCallback } from "react";
+import Link from "next/link";
+import { signOut } from "next-auth/react";
 import {
   User,
   Shield,
-  Key,
-  Bell,
-  Palette,
   Download,
-  Trash2,
   LogOut,
+  Settings2,
   ChevronRight,
-  Smartphone,
-  Check,
-  Loader2,
+  FileJson,
+  FileText,
+  Lock,
 } from "lucide-react";
-import {
-  Button,
-  Input,
-  PasswordInput,
-  Modal,
-  ConfirmDialog,
-  DashboardWrapper,
-} from "@/components/ui";
+import { Button } from "@/components/ui/Button";
+import { DashboardWrapper } from "@/components/ui/DashboardWrapper";
+import { Modal } from "@/components/ui/Modal";
+import { useVaultStore } from "@/stores";
 
 export default function SettingsPage() {
-  const { data: session } = useSession();
-  const user = session?.user;
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const { passwords, encryptionKey } = useVaultStore();
 
-  // Profile state
-  const [name, setName] = useState(user?.name || "");
-  const [isSavingProfile, setIsSavingProfile] = useState(false);
-
-  // Password change state
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-
-  // MFA state
-  const [showMfaSetup, setShowMfaSetup] = useState(false);
-  const [mfaCode, setMfaCode] = useState("");
-  const [isEnablingMfa, setIsEnablingMfa] = useState(false);
-
-  // Delete account state
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  // Export state
+  // Export modal state
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportFormat, setExportFormat] = useState<"json" | "csv">("json");
   const [isExporting, setIsExporting] = useState(false);
 
-  const handleSaveProfile = async () => {
-    setIsSavingProfile(true);
-    // TODO: Implement profile update API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSavingProfile(false);
-    setActiveSection(null);
-  };
-
-  const handleChangePassword = async () => {
-    if (newPassword !== confirmPassword) {
-      alert("Passwords do not match");
+  const handleExport = useCallback(async () => {
+    if (!encryptionKey) {
+      alert("Encryption key not available. Please try again.");
       return;
     }
-    setIsChangingPassword(true);
-    // TODO: Implement password change API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsChangingPassword(false);
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setActiveSection(null);
-  };
 
-  const handleEnableMfa = async () => {
-    setIsEnablingMfa(true);
-    // TODO: Implement MFA enable API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsEnablingMfa(false);
-    setShowMfaSetup(false);
-    setMfaCode("");
-  };
-
-  const handleExportData = async () => {
     setIsExporting(true);
-    // TODO: Implement data export
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsExporting(false);
-  };
+    try {
+      const decryptedPasswords = passwords.map((p) => ({
+        title: p.title,
+        username: p.username || "",
+        password: p.password || "[Unable to decrypt]",
+        url: p.url || "",
+        notes: p.notes || "",
+        categoryId: p.categoryId || "",
+        favorite: p.favorite,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+      }));
 
-  const handleDeleteAccount = async () => {
-    setIsDeleting(true);
-    // TODO: Implement account deletion API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsDeleting(false);
+      let content: string;
+      let mimeType: string;
+      let filename: string;
+
+      if (exportFormat === "json") {
+        content = JSON.stringify(decryptedPasswords, null, 2);
+        mimeType = "application/json";
+        filename = `vault-export-${new Date().toISOString().split("T")[0]}.json`;
+      } else {
+        const headers = [
+          "Title",
+          "Username",
+          "Password",
+          "URL",
+          "Notes",
+          "Category ID",
+          "Favorite",
+          "Created At",
+          "Updated At",
+        ];
+        const rows = decryptedPasswords.map((p) => [
+          p.title,
+          p.username,
+          p.password,
+          p.url,
+          p.notes,
+          p.categoryId,
+          p.favorite ? "Yes" : "No",
+          String(p.createdAt),
+          String(p.updatedAt),
+        ]);
+
+        const escapeCsv = (value: string) => {
+          if (
+            value.includes(",") ||
+            value.includes('"') ||
+            value.includes("\n")
+          ) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value;
+        };
+
+        content = [
+          headers.join(","),
+          ...rows.map((row) => row.map(escapeCsv).join(",")),
+        ].join("\n");
+        mimeType = "text/csv";
+        filename = `vault-export-${new Date().toISOString().split("T")[0]}.csv`;
+      }
+
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setShowExportModal(false);
+    } catch (error) {
+      console.error("Export failed:", error);
+      alert("Failed to export data. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  }, [encryptionKey, passwords, exportFormat]);
+
+  const handleSignOut = useCallback(async () => {
     await signOut({ callbackUrl: "/login" });
-  };
+  }, []);
 
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: "/login" });
-  };
-
-  // TODO: Fetch MFA status from API
-  const mfaEnabled = false;
-
-  const settingsSections = [
+  const settingsItems = [
     {
-      id: "profile",
+      type: "link" as const,
+      href: "/vault/settings/profile",
       icon: User,
-      title: "Profile",
-      description: "Update your personal information",
+      label: "Profile",
+      description: "Update your name and profile information",
     },
     {
-      id: "password",
-      icon: Key,
-      title: "Change Password",
-      description: "Update your master password",
-    },
-    {
-      id: "mfa",
+      type: "link" as const,
+      href: "/vault/settings/security",
       icon: Shield,
-      title: "Two-Factor Authentication",
-      description: mfaEnabled ? "Enabled" : "Not enabled",
+      label: "Security",
+      description: "Manage 2FA and password settings",
     },
     {
-      id: "notifications",
-      icon: Bell,
-      title: "Notifications",
-      description: "Manage notification preferences",
+      type: "link" as const,
+      href: "/vault/settings/account",
+      icon: Settings2,
+      label: "Account",
+      description: "Manage your account and danger zone",
     },
     {
-      id: "appearance",
-      icon: Palette,
-      title: "Appearance",
-      description: "Customize the look and feel",
+      type: "action" as const,
+      onClick: () => setShowExportModal(true),
+      icon: Download,
+      label: "Export Data",
+      description: "Download your vault data as JSON or CSV",
+    },
+    {
+      type: "action" as const,
+      onClick: handleSignOut,
+      icon: LogOut,
+      label: "Sign Out",
+      description: "Sign out of your account",
     },
   ];
 
   return (
     <DashboardWrapper>
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
+      <div className="max-w-4xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
           <p className="text-muted-foreground text-lg">
@@ -150,276 +169,154 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        {/* User Info */}
-        <div className="rounded-3xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-2xl font-semibold text-primary-foreground">
-              {user?.name?.charAt(0).toUpperCase() ||
-                user?.email?.charAt(0).toUpperCase() ||
-                "U"}
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">
-                {user?.name || "User"}
-              </h2>
-              <p className="text-muted-foreground">{user?.email}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Settings Sections */}
         <div className="space-y-2">
-          {settingsSections.map((section) => (
-            <button
-              key={section.id}
-              onClick={() =>
-                setActiveSection(
-                  activeSection === section.id ? null : section.id,
-                )
-              }
-              className="flex w-full items-center justify-between rounded-xl border bg-card p-4 text-left hover:bg-accent transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                  <section.icon className="h-5 w-5 text-muted-foreground" />
+          {settingsItems.map((item) => {
+            const Icon = item.icon;
+            const isDanger = "variant" in item && item.variant === "danger";
+
+            if (item.type === "link") {
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-lg bg-muted">
+                      <Icon className="w-5 h-5 text-foreground" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">
+                        {item.label}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                </Link>
+              );
+            }
+
+            return (
+              <button
+                key={item.label}
+                onClick={item.onClick}
+                className={`w-full flex items-center justify-between p-4 rounded-lg border transition-colors text-left ${
+                  isDanger
+                    ? "border-destructive/50 bg-destructive/5 hover:bg-destructive/10"
+                    : "border-border bg-card hover:bg-muted/50"
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`p-2 rounded-lg ${isDanger ? "bg-destructive/10" : "bg-muted"}`}
+                  >
+                    <Icon
+                      className={`w-5 h-5 ${isDanger ? "text-destructive" : "text-foreground"}`}
+                    />
+                  </div>
+                  <div>
+                    <p
+                      className={`font-medium ${isDanger ? "text-destructive" : "text-foreground"}`}
+                    >
+                      {item.label}
+                    </p>
+                    <p
+                      className={`text-sm ${isDanger ? "text-destructive/70" : "text-muted-foreground"}`}
+                    >
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium text-foreground">
-                    {section.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {section.description}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Export Modal */}
+      <Modal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        title="Export Vault Data"
+      >
+        <div className="space-y-6">
+          <p className="text-sm text-muted-foreground">
+            Your passwords will be exported with decrypted values. Keep this
+            file secure.
+          </p>
+
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Export Format</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setExportFormat("json")}
+                className={`flex items-center gap-3 p-4 rounded-lg border transition-colors ${
+                  exportFormat === "json"
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:bg-muted/50"
+                }`}
+              >
+                <FileJson
+                  className={`w-5 h-5 ${exportFormat === "json" ? "text-primary" : "text-muted-foreground"}`}
+                />
+                <div className="text-left">
+                  <p className="font-medium">JSON</p>
+                  <p className="text-xs text-muted-foreground">
+                    Structured data
                   </p>
                 </div>
-              </div>
-              <ChevronRight
-                className={`h-5 w-5 text-muted-foreground transition-transform ${activeSection === section.id ? "rotate-90" : ""}`}
-              />
-            </button>
-          ))}
+              </button>
+              <button
+                onClick={() => setExportFormat("csv")}
+                className={`flex items-center gap-3 p-4 rounded-lg border transition-colors ${
+                  exportFormat === "csv"
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:bg-muted/50"
+                }`}
+              >
+                <FileText
+                  className={`w-5 h-5 ${exportFormat === "csv" ? "text-primary" : "text-muted-foreground"}`}
+                />
+                <div className="text-left">
+                  <p className="font-medium">CSV</p>
+                  <p className="text-xs text-muted-foreground">Spreadsheet</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <Lock className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-amber-500">Security Warning</p>
+              <p className="text-muted-foreground">
+                The exported file will contain your actual passwords. Store it
+                securely.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              variant="secondary"
+              onClick={() => setShowExportModal(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleExport}
+              isLoading={isExporting}
+              className="flex-1"
+            >
+              Export
+            </Button>
+          </div>
         </div>
-
-        {/* Profile Section */}
-        {activeSection === "profile" && (
-          <div className="mt-4 rounded-xl border bg-card p-4 space-y-4">
-            <Input
-              label="Display Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-            />
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => setActiveSection(null)}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleSaveProfile} isLoading={isSavingProfile}>
-                Save
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Password Section */}
-        {activeSection === "password" && (
-          <div className="mt-4 rounded-xl border bg-card p-4 space-y-4">
-            <PasswordInput
-              label="Current Password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter current password"
-            />
-            <PasswordInput
-              label="New Password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Enter new password"
-            />
-            <PasswordInput
-              label="Confirm New Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
-            />
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => setActiveSection(null)}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleChangePassword}
-                isLoading={isChangingPassword}
-              >
-                Change Password
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* MFA Section */}
-        {activeSection === "mfa" && (
-          <div className="mt-4 rounded-xl border bg-card p-4">
-            {mfaEnabled ? (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/20">
-                    <Check className="h-5 w-5 text-green-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">
-                      2FA is enabled
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Your account is protected
-                    </p>
-                  </div>
-                </div>
-                <Button variant="destructive" size="sm">
-                  Disable
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-500/20">
-                    <Smartphone className="h-5 w-5 text-yellow-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">
-                      2FA is not enabled
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Add an extra layer of security
-                    </p>
-                  </div>
-                </div>
-                <Button onClick={() => setShowMfaSetup(true)}>
-                  Enable Two-Factor Authentication
-                </Button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Danger Zone */}
-        <div className="mt-8 space-y-2">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-2">
-            Data & Account
-          </h3>
-
-          <button
-            onClick={handleExportData}
-            disabled={isExporting}
-            className="flex w-full items-center justify-between rounded-xl border bg-card p-4 text-left hover:bg-accent transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                <Download className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <h3 className="font-medium text-foreground">Export Data</h3>
-                <p className="text-sm text-muted-foreground">
-                  Download your vault data
-                </p>
-              </div>
-            </div>
-            {isExporting && <Loader2 className="h-4 w-4 animate-spin" />}
-          </button>
-
-          <button
-            onClick={handleLogout}
-            className="flex w-full items-center justify-between rounded-xl border bg-card p-4 text-left hover:bg-accent transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                <LogOut className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <h3 className="font-medium text-foreground">Sign Out</h3>
-                <p className="text-sm text-muted-foreground">
-                  Log out of your account
-                </p>
-              </div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => setShowDeleteConfirm(true)}
-            className="flex w-full items-center justify-between rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-left hover:border-destructive/50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/20">
-                <Trash2 className="h-5 w-5 text-destructive" />
-              </div>
-              <div>
-                <h3 className="font-medium text-destructive">Delete Account</h3>
-                <p className="text-sm text-muted-foreground">
-                  Permanently delete your account and data
-                </p>
-              </div>
-            </div>
-          </button>
-        </div>
-
-        {/* MFA Setup Modal */}
-        <Modal
-          isOpen={showMfaSetup}
-          onClose={() => setShowMfaSetup(false)}
-          title="Set Up Two-Factor Authentication"
-        >
-          <div className="space-y-4">
-            <p className="text-muted-foreground">
-              Scan the QR code with your authenticator app (Google
-              Authenticator, Authy, etc.)
-            </p>
-            <div className="flex justify-center">
-              <div className="h-48 w-48 rounded-lg bg-white p-4">
-                {/* QR Code placeholder */}
-                <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground text-sm">
-                  QR Code
-                </div>
-              </div>
-            </div>
-            <Input
-              label="Enter Code from App"
-              value={mfaCode}
-              onChange={(e) => setMfaCode(e.target.value)}
-              placeholder="000000"
-              className="text-center text-2xl tracking-widest"
-            />
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => setShowMfaSetup(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleEnableMfa}
-                disabled={mfaCode.length !== 6}
-                isLoading={isEnablingMfa}
-              >
-                Verify & Enable
-              </Button>
-            </div>
-          </div>
-        </Modal>
-
-        {/* Delete Account Confirmation */}
-        <ConfirmDialog
-          isOpen={showDeleteConfirm}
-          onClose={() => setShowDeleteConfirm(false)}
-          onConfirm={handleDeleteAccount}
-          title="Delete Account"
-          message="This action cannot be undone. All your data will be permanently deleted."
-          confirmText="Delete Account"
-          isLoading={isDeleting}
-        />
-      </div>
+      </Modal>
     </DashboardWrapper>
   );
 }

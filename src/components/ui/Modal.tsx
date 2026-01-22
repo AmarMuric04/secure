@@ -119,7 +119,7 @@ export function ConfirmDialog({
   isLoading = false,
 }: ConfirmDialogProps) {
   const variantStyles = {
-    danger: "bg-red-600 hover:bg-red-700 focus:ring-red-500",
+    danger: "bg-orange-600 hover:bg-orange-700 focus:ring-orange-500",
     warning: "bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500",
     info: "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500",
   };

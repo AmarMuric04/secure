@@ -2,9 +2,10 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { useLocalStorage } from "usehooks-ts";
 import { usePasswordsQuery } from "@/hooks";
 import { cn, formatRelativeTime } from "@/lib/utils";
-import { Button, Input, Skeleton, DashboardWrapper } from "@/components/ui";
+import { Button, Input, Skeleton, DashboardWrapper, EmptyState } from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
 import {
   Tooltip,
@@ -55,7 +56,10 @@ export default function FavoritesPage() {
     toggleFavorite,
   } = usePasswordsQuery();
 
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useLocalStorage<ViewMode>(
+    "favorites-view-mode",
+    "grid",
+  );
   const [searchQuery, setSearchQuery] = useState("");
 
   // Filter favorites by search
@@ -219,19 +223,16 @@ export default function FavoritesPage() {
 
         {/* Empty State */}
         {!isPending && !isError && favorites.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-64 gap-4">
-            <div className="h-16 w-16 rounded-full bg-yellow-500/10 flex items-center justify-center">
-              <Star className="h-8 w-8 text-yellow-500" />
-            </div>
-            <div className="text-center">
-              <h2 className="text-lg font-semibold text-foreground">
-                No favorites yet
-              </h2>
-              <p className="text-muted-foreground mt-1">
-                Star your most-used passwords for quick access
-              </p>
-            </div>
-          </div>
+          <EmptyState
+            icon={<Star className="h-8 w-8 text-muted-foreground" />}
+            title="No favorites yet"
+            description="Star your most-used passwords for quick access"
+            action={
+              <Button asChild variant="outline" className="rounded-2xl">
+                <Link href="/vault">Back to Vault</Link>
+              </Button>
+            }
+          />
         )}
 
         {/* Data loaded successfully */}
@@ -373,26 +374,20 @@ export default function FavoritesPage() {
 
             {/* Results */}
             {filteredFavorites.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64 gap-4">
-                <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-                  <Search className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <div className="text-center">
-                  <h2 className="text-lg font-semibold text-foreground">
-                    No results found
-                  </h2>
-                  <p className="text-muted-foreground mt-1">
-                    Try adjusting your search query
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => setSearchQuery("")}
-                  className="rounded-2xl"
-                >
-                  Clear search
-                </Button>
-              </div>
+              <EmptyState
+                icon={<Search className="h-8 w-8 text-muted-foreground" />}
+                title="No results found"
+                description="Try adjusting your search query"
+                action={
+                  <Button
+                    variant="outline"
+                    onClick={() => setSearchQuery("")}
+                    className="rounded-2xl"
+                  >
+                    Clear search
+                  </Button>
+                }
+              />
             ) : (
               <>
                 {/* Favorites Grid/List */}

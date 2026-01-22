@@ -785,15 +785,94 @@ export function usePasswordQuery(id: string) {
 export function usePrefetchPasswords() {
   const queryClient = useQueryClient();
   const encryptionKey = useVaultStore((state) => state.encryptionKey);
+  const isLocked = useVaultStore((state) => state.isLocked);
 
   return {
-    prefetch: (filters: PasswordFilters = {}) => {
-      if (encryptionKey) {
-        queryClient.prefetchQuery({
-          queryKey: passwordKeys.list(filters),
-          staleTime: 5 * 60 * 1000,
-        });
-      }
+    prefetch: async (filters: PasswordFilters = {}) => {
+      if (!encryptionKey || isLocked) return;
+
+      await queryClient.prefetchQuery({
+        queryKey: passwordKeys.list(filters),
+        queryFn: async (): Promise<DecryptedPasswordEntry[]> => {
+          const vault = await fetchVaultData(filters.includeDeleted);
+
+          // Decrypt all passwords in parallel
+          const decryptionResults = await Promise.allSettled(
+            vault.passwords.map(async (entry) => {
+              const decryptedData = await decryptData<{
+                title: string;
+                username?: string;
+                password: string;
+                url?: string;
+                notes?: string;
+                customFields?: Array<{
+                  name: string;
+                  value: string;
+                  type: "text" | "password" | "hidden";
+                }>;
+              }>(entry.encryptedData, entry.iv, encryptionKey);
+
+              return {
+                _id: entry._id,
+                ...decryptedData,
+                categoryId: entry.categoryId,
+                tags: entry.tags,
+                favorite: entry.favorite,
+                passwordStrength: entry.passwordStrength,
+                isCompromised: entry.isCompromised,
+                isReused: entry.isReused,
+                deletedAt: entry.deletedAt,
+                createdAt: entry.createdAt,
+                updatedAt: entry.updatedAt,
+                lastUsedAt: entry.lastUsedAt,
+              };
+            }),
+          );
+
+          // Filter out failed decryptions
+          const decryptedPasswords: DecryptedPasswordEntry[] = [];
+          for (const result of decryptionResults) {
+            if (result.status === "fulfilled") {
+              decryptedPasswords.push(result.value);
+            }
+          }
+
+          // Apply client-side filters
+          let filtered = decryptedPasswords;
+
+          if (!filters.includeDeleted) {
+            filtered = filtered.filter((p) => !p.deletedAt);
+          }
+
+          if (filters.categoryId) {
+            filtered = filtered.filter(
+              (p) => p.categoryId === filters.categoryId,
+            );
+          }
+
+          if (filters.favorite) {
+            filtered = filtered.filter((p) => p.favorite);
+          }
+
+          if (filters.tag) {
+            filtered = filtered.filter((p) => p.tags.includes(filters.tag!));
+          }
+
+          if (filters.search) {
+            const searchLower = filters.search.toLowerCase();
+            filtered = filtered.filter(
+              (p) =>
+                p.title.toLowerCase().includes(searchLower) ||
+                p.username?.toLowerCase().includes(searchLower) ||
+                p.url?.toLowerCase().includes(searchLower) ||
+                p.notes?.toLowerCase().includes(searchLower),
+            );
+          }
+
+          return filtered;
+        },
+        staleTime: 5 * 60 * 1000,
+      });
     },
   };
 }

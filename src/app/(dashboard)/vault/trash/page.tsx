@@ -8,14 +8,20 @@ import {
   AlertTriangle,
   Clock,
   User,
-  Globe,
   Search,
   Loader2,
   Trash,
   XCircle,
 } from "lucide-react";
 import { usePasswordsQuery } from "@/hooks";
-import { Button, DashboardWrapper, Checkbox, Skeleton } from "@/components/ui";
+import {
+  Button,
+  DashboardWrapper,
+  Checkbox,
+  Skeleton,
+  LongCard,
+  EmptyState,
+} from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
 
 export default function TrashPage() {
@@ -264,19 +270,18 @@ export default function TrashPage() {
             </div>
 
             {trashedPasswords.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 gap-4">
-                <div className="p-4 rounded-full bg-muted">
-                  <Trash2 className="w-8 h-8 text-muted-foreground" />
-                </div>
-                <h2 className="text-xl font-semibold">Trash is empty</h2>
-                <p className="text-muted-foreground text-center max-w-md">
-                  Deleted passwords will appear here. You can restore them
-                  within 30 days.
-                </p>
-                <Link href="/vault">
-                  <Button variant="outline">Back to Vault</Button>
-                </Link>
-              </div>
+              <EmptyState
+                icon={<Trash2 className="h-8 w-8 text-muted-foreground" />}
+                title="Trash is empty"
+                description="Deleted passwords will appear here. You can restore them within 30 days."
+                action={
+                  <Link href="/vault">
+                    <Button variant="outline" className="rounded-2xl">
+                      Back to Vault
+                    </Button>
+                  </Link>
+                }
+              />
             ) : (
               <>
                 {/* Search & Actions */}
@@ -302,6 +307,7 @@ export default function TrashPage() {
                         size="sm"
                         onClick={handleRestoreSelected}
                         disabled={isRestoring}
+                        className="rounded-2xl"
                       >
                         {isRestoring ? (
                           <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -311,10 +317,11 @@ export default function TrashPage() {
                         Restore Selected
                       </Button>
                       <Button
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
                         onClick={handleDeleteSelected}
                         disabled={isDeleting}
+                        className="rounded-2xl text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-950/20"
                       >
                         {isDeleting ? (
                           <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -352,99 +359,100 @@ export default function TrashPage() {
                     const isUrgent = daysLeft <= 7;
 
                     return (
-                      <div
+                      <LongCard
                         key={password._id}
-                        className={`group relative bg-card border rounded-lg p-4 transition-colors ${
-                          selectedIds.has(password._id)
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-muted-foreground/30"
-                        }`}
+                        variant={
+                          selectedIds.has(password._id) ? "selected" : "default"
+                        }
+                        hoverable={!selectedIds.has(password._id)}
+                        className="relative"
                       >
-                        <div className="flex items-center gap-4">
-                          {/* Checkbox */}
-                          <Checkbox
-                            checked={selectedIds.has(password._id)}
-                            onCheckedChange={() =>
-                              toggleSelection(password._id)
-                            }
-                          />
+                        {/* Checkbox */}
+                        <Checkbox
+                          checked={selectedIds.has(password._id)}
+                          onCheckedChange={() => toggleSelection(password._id)}
+                        />
 
-                          {/* Icon */}
-                          <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                            <Trash2 className="w-5 h-5 text-muted-foreground" />
-                          </div>
+                        {/* Icon/Avatar */}
+                        <div className="h-12 w-12 rounded-2xl bg-muted flex items-center justify-center">
+                          <span className="text-lg font-semibold text-muted-foreground line-through">
+                            {password.title.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
 
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-medium truncate line-through text-muted-foreground">
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-muted-foreground line-through truncate">
                               {password.title}
                             </h3>
-                            <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                              {password.username && (
-                                <span className="flex items-center gap-1 truncate">
-                                  <User className="w-3 h-3" />
-                                  {password.username}
-                                </span>
-                              )}
-                              {password.url && (
-                                <span className="flex items-center gap-1 truncate">
-                                  <Globe className="w-3 h-3" />
-                                  {new URL(password.url).hostname}
-                                </span>
-                              )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                              <User className="h-3.5 w-3.5" />
+                              <span className="truncate max-w-48">
+                                {password.username || "No username"}
+                              </span>
                             </div>
                           </div>
+                        </div>
 
-                          {/* Deletion Timer */}
-                          <div
-                            className={`flex items-center gap-1 text-sm ${
-                              isUrgent
-                                ? "text-red-500"
-                                : "text-muted-foreground"
-                            }`}
-                          >
-                            <Clock className="w-4 h-4" />
-                            <span>
-                              {daysLeft === 0
-                                ? "Deleting soon"
-                                : `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left`}
+                        {/* URL */}
+                        {password.url && (
+                          <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
+                            <span className="truncate max-w-48">
+                              {new URL(password.url).hostname}
                             </span>
                           </div>
+                        )}
 
-                          {/* Deleted At */}
-                          <div className="text-sm text-muted-foreground">
-                            {formatTimeAgo(password.deletedAt)}
-                          </div>
+                        {/* Deletion Timer */}
+                        <div
+                          className={`hidden lg:flex items-center gap-1 text-sm min-w-24 ${
+                            isUrgent ? "text-red-500" : "text-muted-foreground"
+                          }`}
+                        >
+                          <Clock className="w-4 h-4" />
+                          <span>
+                            {daysLeft === 0 ? "Soon" : `${daysLeft}d left`}
+                          </span>
+                        </div>
 
-                          {/* Actions */}
-                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleRestore(password._id)}
-                              disabled={isRestoring}
-                            >
-                              <RotateCcw className="w-4 h-4 mr-1" />
-                              Restore
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() =>
-                                setConfirmPermanentDelete(password._id)
-                              }
-                              disabled={isDeleting}
-                            >
-                              <Trash className="w-4 h-4" />
-                            </Button>
-                          </div>
+                        {/* Deleted At */}
+                        <div className="hidden sm:flex text-sm text-muted-foreground min-w-24">
+                          {formatTimeAgo(password.deletedAt)}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRestore(password._id)}
+                            disabled={isRestoring}
+                            className="rounded-2xl"
+                          >
+                            <RotateCcw className="w-4 h-4 mr-1" />
+                            Restore
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              setConfirmPermanentDelete(password._id)
+                            }
+                            disabled={isDeleting}
+                            className="rounded-2xl text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-950/20"
+                          >
+                            <Trash className="w-4 h-4" />
+                          </Button>
                         </div>
 
                         {/* Confirm Permanent Delete Dialog */}
                         {confirmPermanentDelete === password._id && (
-                          <div className="absolute inset-0 bg-background/95 backdrop-blur-sm rounded-lg flex items-center justify-center p-4">
+                          <div className="absolute inset-0 bg-background/95 backdrop-blur-sm rounded-3xl flex items-center justify-center p-4 z-10">
                             <div className="text-center">
-                              <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+                              <AlertTriangle className="w-8 h-8 text-orange-500 mx-auto mb-2" />
                               <h4 className="font-medium mb-1">
                                 Permanently delete this password?
                               </h4>
@@ -458,16 +466,18 @@ export default function TrashPage() {
                                   onClick={() =>
                                     setConfirmPermanentDelete(null)
                                   }
+                                  className="rounded-2xl"
                                 >
                                   Cancel
                                 </Button>
                                 <Button
-                                  variant="destructive"
+                                  variant="outline"
                                   size="sm"
                                   onClick={() =>
                                     handlePermanentDelete(password._id)
                                   }
                                   disabled={isDeleting}
+                                  className="rounded-2xl text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-950/20"
                                 >
                                   {isDeleting ? (
                                     <Loader2 className="w-4 h-4 animate-spin mr-1" />
@@ -478,15 +488,26 @@ export default function TrashPage() {
                             </div>
                           </div>
                         )}
-                      </div>
+                      </LongCard>
                     );
                   })}
                 </div>
 
                 {filteredPasswords.length === 0 && searchQuery && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No deleted passwords match your search.
-                  </div>
+                  <EmptyState
+                    icon={<Search className="h-8 w-8 text-muted-foreground" />}
+                    title="No results found"
+                    description="No deleted passwords match your search"
+                    action={
+                      <Button
+                        variant="outline"
+                        onClick={() => setSearchQuery("")}
+                        className="rounded-2xl"
+                      >
+                        Clear search
+                      </Button>
+                    }
+                  />
                 )}
               </>
             )}

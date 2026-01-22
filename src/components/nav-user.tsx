@@ -97,7 +97,7 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link href="/vault/settings">
+                <Link href="/vault/settings/profile">
                   <User />
                   Profile
                 </Link>
@@ -109,7 +109,7 @@ export function NavUser({
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/vault/settings">
+                <Link href="/vault/settings/security">
                   <Shield />
                   Security
                 </Link>

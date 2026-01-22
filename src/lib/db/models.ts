@@ -226,6 +226,7 @@ const auditLogSchema = new Schema<AuditLogDocument>(
         "settings_changed",
         "recovery_key_viewed",
         "session_revoked",
+        "account_deleted",
       ] as AuditAction[],
     },
     resourceType: {
