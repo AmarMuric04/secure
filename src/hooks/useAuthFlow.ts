@@ -34,8 +34,30 @@ export function useAuthFlow(): UseAuthFlowReturn {
       setError(null);
 
       try {
-        // Step 1: Derive keys from master password
-        const { authKey } = await deriveKeys(masterPassword, email);
+        // Step 1: Fetch the user's salt from the server
+        const saltResponse = await fetch("/api/auth/salt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        
+        if (!saltResponse.ok) {
+          setError("Failed to fetch authentication data");
+          setIsLoading(false);
+          return false;
+        }
+        
+        const saltData = await saltResponse.json();
+        const salt = saltData.data?.salt;
+        
+        if (!salt) {
+          setError("Invalid authentication data");
+          setIsLoading(false);
+          return false;
+        }
+
+        // Step 2: Derive keys from master password using the fetched salt
+        const { authKey, encryptionKey } = await deriveKeys(masterPassword, salt);
 
         // Convert authKey to hex string for transmission
         const authKeyBytes = await crypto.subtle.exportKey("raw", authKey);
@@ -43,7 +65,7 @@ export function useAuthFlow(): UseAuthFlowReturn {
           .map((b) => b.toString(16).padStart(2, "0"))
           .join("");
 
-        // Step 2: Call login API
+        // Step 3: Call login API
         const result = await authStore.login(email, authHash);
 
         if (!result.success) {
@@ -57,17 +79,14 @@ export function useAuthFlow(): UseAuthFlowReturn {
           return true;
         }
 
-        // Step 3: Import vault key and unlock vault
-        // Note: In a real implementation, you'd get the encrypted vault key from the response
-        // and decrypt it with the derived encryption key
-        const { encryptionKey } = await deriveKeys(masterPassword, email);
+        // Step 4: Set up vault with encryption key
         vaultStore.setEncryptionKey(encryptionKey);
 
         // Save to sessionStorage so it survives page refresh
         const exportedKey = await crypto.subtle.exportKey("jwk", encryptionKey);
         sessionStorage.setItem("vault_key", JSON.stringify(exportedKey));
 
-        // Step 4: Fetch and decrypt vault
+        // Step 5: Fetch and decrypt vault
         await vaultStore.fetchVault();
 
         setIsLoading(false);
