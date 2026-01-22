@@ -45,32 +45,71 @@ function Input({ className, type, label, id, ...props }: InputProps) {
 
 interface PasswordInputProps extends React.ComponentProps<"input"> {
   label?: string;
+  showStrength?: boolean;
+  strength?: 0 | 1 | 2 | 3 | 4;
+  error?: string;
 }
 
-function PasswordInput({ className, label, id, ...props }: PasswordInputProps) {
+function PasswordInput({ className, label, id, showStrength, strength = 0, error, ...props }: PasswordInputProps) {
   const [showPassword, setShowPassword] = React.useState(false);
   const generatedId = React.useId();
   const inputId = id || generatedId;
 
+  const strengthLabels = ["Very Weak", "Weak", "Fair", "Strong", "Very Strong"];
+  const strengthColors = [
+    "bg-red-500",
+    "bg-orange-500", 
+    "bg-yellow-500",
+    "bg-lime-500",
+    "bg-green-500",
+  ];
+
   const inputElement = (
-    <div className="relative">
-      <Input
-        id={inputId}
-        type={showPassword ? "text" : "password"}
-        className={cn("pr-10", className)}
-        {...props}
-      />
-      <button
-        type="button"
-        onClick={() => setShowPassword(!showPassword)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-      >
-        {showPassword ? (
-          <EyeOff className="h-4 w-4" />
-        ) : (
-          <Eye className="h-4 w-4" />
-        )}
-      </button>
+    <div className="space-y-2">
+      <div className="relative">
+        <Input
+          id={inputId}
+          type={showPassword ? "text" : "password"}
+          className={cn("pr-10", error && "border-red-500", className)}
+          aria-invalid={!!error}
+          {...props}
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+        >
+          {showPassword ? (
+            <EyeOff className="h-4 w-4" />
+          ) : (
+            <Eye className="h-4 w-4" />
+          )}
+        </button>
+      </div>
+      {error && (
+        <p className="text-xs text-red-500">{error}</p>
+      )}
+      {showStrength && props.value && !error && (
+        <div className="space-y-1">
+          <div className="flex gap-1">
+            {[0, 1, 2, 3, 4].map((level) => (
+              <div
+                key={level}
+                className={cn(
+                  "h-1 flex-1 rounded-full transition-colors",
+                  level <= strength ? strengthColors[strength] : "bg-muted"
+                )}
+              />
+            ))}
+          </div>
+          <p className={cn(
+            "text-xs",
+            strength <= 1 ? "text-red-500" : strength === 2 ? "text-yellow-500" : "text-green-500"
+          )}>
+            {strengthLabels[strength]}
+          </p>
+        </div>
+      )}
     </div>
   );
 

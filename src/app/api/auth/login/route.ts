@@ -81,6 +81,15 @@ export async function POST(request: NextRequest) {
       return userRateLimitError!;
     }
 
+    // Ensure user has an authHash
+    if (!user.authHash) {
+      return errorResponse(
+        "INVALID_CREDENTIALS",
+        "Invalid email or password",
+        401,
+      );
+    }
+
     // Verify password
     const isValid = await verifyAuthHash(data!.authHash, user.authHash);
 

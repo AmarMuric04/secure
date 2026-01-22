@@ -45,6 +45,11 @@ export async function PUT(request: NextRequest) {
       return errorResponse("NOT_FOUND", "User not found", 404);
     }
 
+    // Ensure user has an authHash
+    if (!user.authHash) {
+      return errorResponse("INVALID_PASSWORD", "Current password is incorrect", 401);
+    }
+
     // Verify current password
     const isValid = await verifyAuthHash(data.currentAuthHash, user.authHash);
 
