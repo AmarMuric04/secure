@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useLocalStorage } from "usehooks-ts";
@@ -66,7 +66,7 @@ type SortOrder = "asc" | "desc";
 
 const ITEMS_PER_PAGE = 10;
 
-export default function VaultPage() {
+function VaultPageContent() {
   const { addToast } = useToast();
   const searchParams = useSearchParams();
   const categoryFilterFromUrl = searchParams.get("category");
@@ -1253,5 +1253,31 @@ function PasswordCard({
         </DropdownMenu>
       </div>
     </div>
+  );
+}
+
+export default function VaultPage() {
+  return (
+    <Suspense fallback={<VaultPageSkeleton />}>
+      <VaultPageContent />
+    </Suspense>
+  );
+}
+
+function VaultPageSkeleton() {
+  return (
+    <DashboardWrapper>
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-10 flex-1" />
+          <Skeleton className="h-10 w-24" />
+        </div>
+        <div className="space-y-3">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full" />
+          ))}
+        </div>
+      </div>
+    </DashboardWrapper>
   );
 }
