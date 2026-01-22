@@ -279,6 +279,48 @@ const rateLimitSchema = new Schema<RateLimitDocument>(
 rateLimitSchema.index({ updatedAt: 1 }, { expireAfterSeconds: 86400 });
 
 // ============================================================================
+// Email Verification Token Model
+// ============================================================================
+
+export interface EmailVerificationTokenDocument extends Document {
+  email: string;
+  token: string;
+  code: string; // 6-digit verification code
+  expiresAt: Date;
+  verified: boolean;
+  // Store registration data temporarily until verified
+  registrationData?: {
+    name?: string;
+    authHash: string;
+    salt: string;
+    encryptedVaultKey: string;
+  };
+}
+
+const emailVerificationTokenSchema = new Schema<EmailVerificationTokenDocument>(
+  {
+    email: { type: String, required: true, lowercase: true, trim: true },
+    token: { type: String, required: true, unique: true },
+    code: { type: String, required: true },
+    expiresAt: { type: Date, required: true },
+    verified: { type: Boolean, default: false },
+    registrationData: {
+      name: { type: String },
+      authHash: { type: String },
+      salt: { type: String },
+      encryptedVaultKey: { type: String },
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
+
+// TTL index: automatically delete expired tokens
+emailVerificationTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+emailVerificationTokenSchema.index({ email: 1 });
+
+// ============================================================================
 // Model Exports
 // ============================================================================
 
@@ -304,3 +346,10 @@ export const AuditLogModel: Model<AuditLogDocument> =
 export const RateLimitModel: Model<RateLimitDocument> =
   mongoose.models.RateLimit ||
   mongoose.model<RateLimitDocument>("RateLimit", rateLimitSchema);
+
+export const EmailVerificationTokenModel: Model<EmailVerificationTokenDocument> =
+  mongoose.models.EmailVerificationToken ||
+  mongoose.model<EmailVerificationTokenDocument>(
+    "EmailVerificationToken",
+    emailVerificationTokenSchema,
+  );

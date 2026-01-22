@@ -30,11 +30,25 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
+    console.log("Salt request for email:", data.email.toLowerCase());
+
     // Find user by email
     const user = await UserModel.findOne({
       email: data.email.toLowerCase(),
       status: "active",
-    }).select("authSalt authProvider");
+    }).select("authSalt authProvider email status");
+
+    console.log(
+      "Found user:",
+      user
+        ? {
+            email: user.email,
+            hasAuthSalt: !!user.authSalt,
+            authProvider: user.authProvider,
+            status: user.status,
+          }
+        : "null",
+    );
 
     if (!user) {
       // Don't reveal if user exists - return a fake salt

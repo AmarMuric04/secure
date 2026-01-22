@@ -53,16 +53,26 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Find user by email
+    console.log("Login attempt for email:", data!.email.toLowerCase());
+
+    // Find user by email (lowercase for consistency)
     const user = await UserModel.findOne({
-      email: data!.email,
+      email: data!.email.toLowerCase(),
       status: "active",
     });
+
+    console.log(
+      "Found user:",
+      user ? { email: user.email, hasAuthHash: !!user.authHash } : "null",
+    );
 
     if (!user) {
       // Log failed attempt
       await logAudit("unknown", "login_failed", request, {
-        metadata: { email: data!.email, reason: "user_not_found" },
+        metadata: {
+          email: data!.email.toLowerCase(),
+          reason: "user_not_found",
+        },
       });
 
       return errorResponse(
@@ -91,7 +101,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password
+    console.log(
+      "Verifying auth hash, client hash length:",
+      data!.authHash.length,
+      "stored hash length:",
+      user.authHash.length,
+    );
     const isValid = await verifyAuthHash(data!.authHash, user.authHash);
+    console.log("Password verification result:", isValid);
 
     if (!isValid) {
       // Log failed attempt

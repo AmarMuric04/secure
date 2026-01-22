@@ -203,18 +203,18 @@ function LoginContent() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm p-8">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 sm:p-10">
+      <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
         Welcome back
       </h2>
-      <p className="text-gray-500 dark:text-gray-400 mb-6">
+      <p className="text-gray-500 dark:text-gray-400 text-lg mb-8">
         Sign in to access your vault
       </p>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-2 text-red-600 dark:text-red-400">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          <span className="text-sm">{error}</span>
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3 text-red-600 dark:text-red-400">
+          <AlertCircle className="h-5 w-5 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
@@ -222,7 +222,7 @@ function LoginContent() {
       <Button
         type="button"
         variant="outline"
-        className="w-full mb-6 gap-3"
+        className="w-full h-12 text-base font-medium rounded-xl mb-8 gap-3"
         onClick={handleGoogleLogin}
         isLoading={isGoogleLoading}
       >
@@ -230,38 +230,38 @@ function LoginContent() {
         Continue with Google
       </Button>
 
-      <div className="relative mb-6">
+      <div className="relative mb-8">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-200 dark:border-gray-700" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-white dark:bg-gray-900 px-4 text-gray-500">
+          <span className="bg-white dark:bg-gray-900 px-4 text-gray-500 font-medium">
             or continue with email
           </span>
         </div>
       </div>
 
-      <form onSubmit={handleCredentialsLogin} className="space-y-4">
+      <form onSubmit={handleCredentialsLogin} className="space-y-5">
         <div className="relative">
-          <Mail className="absolute left-3 top-9 h-4 w-4 text-gray-400" />
+          <Mail className="absolute left-4 top-10 h-5 w-5 text-gray-400" />
           <Input
             label="Email"
             type="email"
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="pl-10"
+            className="pl-12 h-12 rounded-xl text-base"
           />
         </div>
 
         <div className="relative">
-          <Lock className="absolute left-3 top-9 h-4 w-4 text-gray-400 z-10" />
+          <Lock className="absolute left-4 top-10 h-5 w-5 text-gray-400 z-10" />
           <PasswordInput
             label="Master Password"
             placeholder="Enter your master password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="pl-10"
+            className="pl-12 h-12 rounded-xl text-base"
           />
         </div>
 
@@ -280,18 +280,22 @@ function LoginContent() {
           </Link>
         </div>
 
-        <Button type="submit" className="w-full" isLoading={isLoading}>
+        <Button
+          type="submit"
+          className="w-full h-12 text-base font-semibold rounded-xl"
+          isLoading={isLoading}
+        >
           Sign In
         </Button>
       </form>
 
-      <div className="mt-6 text-center">
+      <div className="mt-8 text-center">
         <span className="text-gray-500 dark:text-gray-400">
           Don&apos;t have an account?{" "}
         </span>
         <Link
           href="/register"
-          className="text-blue-600 hover:text-blue-700 font-medium"
+          className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
         >
           Create one
         </Link>

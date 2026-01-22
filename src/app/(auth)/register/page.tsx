@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button, Input, PasswordInput, Checkbox } from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
 import { useAuthFlow } from "@/hooks";
 import { calculatePasswordStrength } from "@/lib/crypto/client";
-import { Mail, Lock, User, AlertCircle, Check } from "lucide-react";
+import { Mail, Lock, User, AlertCircle, Check, ArrowLeft } from "lucide-react";
 
 // Google icon component
 function GoogleIcon({ className }: { className?: string }) {
@@ -34,10 +33,83 @@ function GoogleIcon({ className }: { className?: string }) {
   );
 }
 
+// Verification code input component
+function VerificationCodeInput({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}) {
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleChange = (index: number, digit: string) => {
+    if (!/^\d*$/.test(digit)) return;
+
+    const newValue = value.split("");
+    newValue[index] = digit;
+    const newCode = newValue.join("").slice(0, 6);
+    onChange(newCode);
+
+    // Move to next input
+    if (digit && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === "Backspace" && !value[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
+    onChange(pastedData);
+    if (pastedData.length === 6) {
+      inputRefs.current[5]?.focus();
+    }
+  };
+
+  return (
+    <div className="flex gap-2 justify-center">
+      {[0, 1, 2, 3, 4, 5].map((index) => (
+        <input
+          key={index}
+          ref={(el) => {
+            inputRefs.current[index] = el;
+          }}
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={value[index] || ""}
+          onChange={(e) => handleChange(index, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(index, e)}
+          onPaste={handlePaste}
+          disabled={disabled}
+          className="w-12 h-14 text-center text-2xl font-semibold border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none disabled:opacity-50"
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function RegisterPage() {
-  const router = useRouter();
   const { addToast } = useToast();
-  const { register, isLoading, error } = useAuthFlow();
+  const {
+    startRegistration,
+    completeRegistration,
+    pendingVerification,
+    clearPendingVerification,
+    isLoading,
+    error,
+  } = useAuthFlow();
 
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -45,6 +117,8 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [resendCountdown, setResendCountdown] = useState(0);
 
   const strength = calculatePasswordStrength(password);
 
@@ -58,6 +132,17 @@ export default function RegisterPage() {
       met: /[!@#$%^&*(),.?":{}|<>]/.test(password),
     },
   ];
+
+  // Countdown timer for resend
+  useEffect(() => {
+    if (resendCountdown > 0) {
+      const timer = setTimeout(
+        () => setResendCountdown(resendCountdown - 1),
+        1000,
+      );
+      return () => clearTimeout(timer);
+    }
+  }, [resendCountdown]);
 
   const handleGoogleSignUp = async () => {
     setIsGoogleLoading(true);
@@ -73,7 +158,7 @@ export default function RegisterPage() {
     }
   };
 
-  const handleRegister = useCallback(
+  const handleStartRegistration = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
 
@@ -113,15 +198,19 @@ export default function RegisterPage() {
         return;
       }
 
-      const result = await register(email, password, name || undefined);
+      const result = await startRegistration(
+        email,
+        password,
+        name || undefined,
+      );
 
-      if (result) {
+      if (result.success) {
         addToast({
           type: "success",
-          title: "Account created!",
-          message: "Your vault is ready to use",
+          title: "Verification email sent!",
+          message: "Please check your inbox for the verification code",
         });
-        router.push("/vault");
+        setResendCountdown(60); // 60 second cooldown before resend
       }
     },
     [
@@ -131,25 +220,149 @@ export default function RegisterPage() {
       name,
       acceptedTerms,
       strength.score,
-      register,
+      startRegistration,
       addToast,
-      router,
     ],
   );
 
+  const handleVerifyCode = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+
+      if (verificationCode.length !== 6) {
+        addToast({
+          type: "error",
+          title: "Invalid code",
+          message: "Please enter the 6-digit verification code",
+        });
+        return;
+      }
+
+      const result = await completeRegistration(verificationCode);
+
+      if (result) {
+        // Navigate immediately - don't do anything that triggers re-render
+        // The success will be evident from being on /vault
+        window.location.href = "/vault";
+        // Keep function "hanging" to prevent any state updates from re-rendering
+        await new Promise(() => {});
+      }
+    },
+    [verificationCode, completeRegistration, addToast],
+  );
+
+  const handleResendCode = useCallback(async () => {
+    if (resendCountdown > 0) return;
+
+    const result = await startRegistration(email, password, name || undefined);
+
+    if (result.success) {
+      addToast({
+        type: "success",
+        title: "Code resent!",
+        message: "Please check your inbox for the new verification code",
+      });
+      setResendCountdown(60);
+      setVerificationCode("");
+    }
+  }, [email, password, name, resendCountdown, startRegistration, addToast]);
+
+  const handleBackToForm = useCallback(() => {
+    clearPendingVerification();
+    setVerificationCode("");
+  }, [clearPendingVerification]);
+
+  // Show verification step if we have pending verification
+  if (pendingVerification) {
+    return (
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 sm:p-10">
+        <button
+          onClick={handleBackToForm}
+          className="flex items-center gap-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 mb-8 transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          <span className="text-sm font-medium">Back to registration</span>
+        </button>
+
+        <div className="text-center mb-10">
+          <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Mail className="h-10 w-10 text-blue-600 dark:text-blue-400" />
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+            Check your email
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 text-lg">
+            We sent a verification code to
+          </p>
+          <p className="font-semibold text-gray-900 dark:text-white text-lg mt-1">
+            {pendingVerification.email}
+          </p>
+        </div>
+
+        {error && (
+          <div className="mb-8 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3 text-red-600 dark:text-red-400">
+            <AlertCircle className="h-5 w-5 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleVerifyCode} className="space-y-8">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 text-center">
+              Enter verification code
+            </label>
+            <VerificationCodeInput
+              value={verificationCode}
+              onChange={setVerificationCode}
+              disabled={isLoading}
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full h-12 text-base font-semibold rounded-xl"
+            isLoading={isLoading}
+            disabled={verificationCode.length !== 6}
+          >
+            Verify & Create Account
+          </Button>
+        </form>
+
+        <div className="mt-8 text-center">
+          <p className="text-gray-500 dark:text-gray-400">
+            Didn&apos;t receive the code?{" "}
+            {resendCountdown > 0 ? (
+              <span className="text-gray-400 font-medium">
+                Resend in {resendCountdown}s
+              </span>
+            ) : (
+              <button
+                onClick={handleResendCode}
+                className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+                disabled={isLoading}
+              >
+                Resend code
+              </button>
+            )}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm p-8">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 sm:p-10">
+      <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
         Create your vault
       </h2>
-      <p className="text-gray-500 dark:text-gray-400 mb-6">
+      <p className="text-gray-500 dark:text-gray-400 text-lg mb-8">
         Set up your secure password manager
       </p>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-2 text-red-600 dark:text-red-400">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          <span className="text-sm">{error}</span>
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3 text-red-600 dark:text-red-400">
+          <AlertCircle className="h-5 w-5 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
@@ -157,7 +370,7 @@ export default function RegisterPage() {
       <Button
         type="button"
         variant="outline"
-        className="w-full mb-6 gap-3"
+        className="w-full h-12 text-base font-medium rounded-xl mb-8 gap-3"
         onClick={handleGoogleSignUp}
         isLoading={isGoogleLoading}
       >
@@ -165,50 +378,50 @@ export default function RegisterPage() {
         Continue with Google
       </Button>
 
-      <div className="relative mb-6">
+      <div className="relative mb-8">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-200 dark:border-gray-700" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-white dark:bg-gray-900 px-4 text-gray-500">
+          <span className="bg-white dark:bg-gray-900 px-4 text-gray-500 font-medium">
             or create with email
           </span>
         </div>
       </div>
 
-      <form onSubmit={handleRegister} className="space-y-4">
+      <form onSubmit={handleStartRegistration} className="space-y-5">
         <div className="relative">
-          <Mail className="absolute left-3 top-9 h-4 w-4 text-gray-400" />
+          <Mail className="absolute left-4 top-10 h-5 w-5 text-gray-400" />
           <Input
             label="Email"
             type="email"
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="pl-10"
+            className="pl-12 h-12 rounded-xl text-base"
           />
         </div>
 
         <div className="relative">
-          <User className="absolute left-3 top-9 h-4 w-4 text-gray-400" />
+          <User className="absolute left-4 top-10 h-5 w-5 text-gray-400" />
           <Input
             label="Display Name (optional)"
             type="text"
             placeholder="Your name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="pl-10"
+            className="pl-12 h-12 rounded-xl text-base"
           />
         </div>
 
         <div className="relative">
-          <Lock className="absolute left-3 top-9 h-4 w-4 text-gray-400 z-10" />
+          <Lock className="absolute left-4 top-10 h-5 w-5 text-gray-400 z-10" />
           <PasswordInput
             label="Master Password"
             placeholder="Create a strong master password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="pl-10"
+            className="pl-12 h-12 rounded-xl text-base"
             showStrength
             strength={strength.score as 0 | 1 | 2 | 3 | 4}
           />
@@ -241,13 +454,13 @@ export default function RegisterPage() {
         )}
 
         <div className="relative">
-          <Lock className="absolute left-3 top-9 h-4 w-4 text-gray-400 z-10" />
+          <Lock className="absolute left-4 top-10 h-5 w-5 text-gray-400 z-10" />
           <PasswordInput
             label="Confirm Master Password"
             placeholder="Repeat your master password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="pl-10"
+            className="pl-12 h-12 rounded-xl text-base"
             error={
               confirmPassword && password !== confirmPassword
                 ? "Passwords do not match"
@@ -256,7 +469,7 @@ export default function RegisterPage() {
           />
         </div>
 
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
           <p className="text-sm text-yellow-800 dark:text-yellow-200">
             <strong>Important:</strong> Your master password cannot be
             recovered. If you forget it, you will lose access to your vault.
@@ -268,26 +481,30 @@ export default function RegisterPage() {
           <Checkbox
             checked={acceptedTerms}
             onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
-            className="mt-0.5"
+            className="mt-1"
           />
-          <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+          <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors leading-relaxed">
             I understand that SecureVault uses zero-knowledge encryption and
             cannot recover my master password.
           </span>
         </label>
 
-        <Button type="submit" className="w-full" isLoading={isLoading}>
-          Create Account
+        <Button
+          type="submit"
+          className="w-full h-12 text-base font-semibold rounded-xl"
+          isLoading={isLoading}
+        >
+          Continue
         </Button>
       </form>
 
-      <div className="mt-6 text-center">
+      <div className="mt-8 text-center">
         <span className="text-gray-500 dark:text-gray-400">
           Already have an account?{" "}
         </span>
         <Link
           href="/login"
-          className="text-blue-600 hover:text-blue-700 font-medium"
+          className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
         >
           Sign in
         </Link>

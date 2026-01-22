@@ -5,7 +5,13 @@ import Link from "next/link";
 import { useLocalStorage } from "usehooks-ts";
 import { usePasswordsQuery } from "@/hooks";
 import { cn, formatRelativeTime } from "@/lib/utils";
-import { Button, Input, Skeleton, DashboardWrapper, EmptyState } from "@/components/ui";
+import {
+  Button,
+  Input,
+  Skeleton,
+  DashboardWrapper,
+  EmptyState,
+} from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
 import {
   Tooltip,

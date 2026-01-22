@@ -124,8 +124,7 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Your Passwords,{" "}
-              <span className="text-primary">Truly Secure</span>
+              Your Passwords, <span className="text-primary">Truly Secure</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
               SecureVault uses zero-knowledge encryption to protect your

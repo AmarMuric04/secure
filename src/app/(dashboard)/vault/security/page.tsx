@@ -2,10 +2,24 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { ShieldAlert, AlertTriangle, RefreshCw, User, CheckCircle, Plus } from "lucide-react";
+import {
+  ShieldAlert,
+  AlertTriangle,
+  RefreshCw,
+  User,
+  CheckCircle,
+  Plus,
+} from "lucide-react";
 import { usePasswordsQuery } from "@/hooks";
 import { DecryptedPasswordEntry } from "@/stores";
-import { Button, DashboardWrapper, Skeleton, MetricCard, LongCard, EmptyState } from "@/components/ui";
+import {
+  Button,
+  DashboardWrapper,
+  Skeleton,
+  MetricCard,
+  LongCard,
+  EmptyState,
+} from "@/components/ui";
 import { formatRelativeTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 

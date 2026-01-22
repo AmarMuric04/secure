@@ -50,7 +50,15 @@ interface PasswordInputProps extends React.ComponentProps<"input"> {
   error?: string;
 }
 
-function PasswordInput({ className, label, id, showStrength, strength = 0, error, ...props }: PasswordInputProps) {
+function PasswordInput({
+  className,
+  label,
+  id,
+  showStrength,
+  strength = 0,
+  error,
+  ...props
+}: PasswordInputProps) {
   const [showPassword, setShowPassword] = React.useState(false);
   const generatedId = React.useId();
   const inputId = id || generatedId;
@@ -58,7 +66,7 @@ function PasswordInput({ className, label, id, showStrength, strength = 0, error
   const strengthLabels = ["Very Weak", "Weak", "Fair", "Strong", "Very Strong"];
   const strengthColors = [
     "bg-red-500",
-    "bg-orange-500", 
+    "bg-orange-500",
     "bg-yellow-500",
     "bg-lime-500",
     "bg-green-500",
@@ -86,9 +94,7 @@ function PasswordInput({ className, label, id, showStrength, strength = 0, error
           )}
         </button>
       </div>
-      {error && (
-        <p className="text-xs text-red-500">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-500">{error}</p>}
       {showStrength && props.value && !error && (
         <div className="space-y-1">
           <div className="flex gap-1">
@@ -97,15 +103,21 @@ function PasswordInput({ className, label, id, showStrength, strength = 0, error
                 key={level}
                 className={cn(
                   "h-1 flex-1 rounded-full transition-colors",
-                  level <= strength ? strengthColors[strength] : "bg-muted"
+                  level <= strength ? strengthColors[strength] : "bg-muted",
                 )}
               />
             ))}
           </div>
-          <p className={cn(
-            "text-xs",
-            strength <= 1 ? "text-red-500" : strength === 2 ? "text-yellow-500" : "text-green-500"
-          )}>
+          <p
+            className={cn(
+              "text-xs",
+              strength <= 1
+                ? "text-red-500"
+                : strength === 2
+                  ? "text-yellow-500"
+                  : "text-green-500",
+            )}
+          >
             {strengthLabels[strength]}
           </p>
         </div>

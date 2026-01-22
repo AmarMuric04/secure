@@ -3,12 +3,7 @@
 import { useState, useCallback } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  Trash2,
-  AlertTriangle,
-  UserX,
-} from "lucide-react";
+import { ArrowLeft, Trash2, AlertTriangle, UserX } from "lucide-react";
 import { Button, Input, Modal, DashboardWrapper } from "@/components/ui";
 
 export default function AccountSettingsPage() {
@@ -76,7 +71,9 @@ export default function AccountSettingsPage() {
                 <UserX className="h-6 w-6 text-destructive" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-foreground">Delete Account</h3>
+                <h3 className="font-semibold text-foreground">
+                  Delete Account
+                </h3>
                 <p className="text-sm text-muted-foreground mt-1">
                   Permanently delete your account and all associated data. This
                   includes all your passwords, categories, and settings. This

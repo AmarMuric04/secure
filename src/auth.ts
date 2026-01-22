@@ -30,11 +30,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         authHash: { label: "Auth Hash", type: "password" },
       },
       async authorize(credentials) {
+        console.log("[NextAuth Credentials] Authorize called");
+
         if (!credentials?.email || !credentials?.authHash) {
+          console.log("[NextAuth Credentials] Missing credentials");
           return null;
         }
 
         await connectDB();
+
+        console.log(
+          "[NextAuth Credentials] Looking for user:",
+          (credentials.email as string).toLowerCase(),
+        );
 
         const user = await UserModel.findOne({
           email: (credentials.email as string).toLowerCase(),
@@ -42,18 +50,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }).select("+authHash +authSalt");
 
         if (!user) {
+          console.log("[NextAuth Credentials] User not found");
           return null;
         }
 
+        console.log(
+          "[NextAuth Credentials] User found, hasAuthHash:",
+          !!user.authHash,
+        );
+
         // OAuth users don't have authHash - they should use Google sign-in
         if (!user.authHash) {
+          console.log(
+            "[NextAuth Credentials] User has no authHash (OAuth user)",
+          );
           return null;
         }
+
+        console.log(
+          "[NextAuth Credentials] Verifying authHash, lengths:",
+          (credentials.authHash as string).length,
+          user.authHash.length,
+        );
 
         const isValid = await verifyAuthHash(
           credentials.authHash as string,
           user.authHash,
         );
+
+        console.log("[NextAuth Credentials] Verification result:", isValid);
 
         if (!isValid) {
           return null;

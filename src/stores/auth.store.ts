@@ -40,6 +40,7 @@ interface AuthState {
 
   // State actions
   setError: (error: string | null) => void;
+  setUser: (user: UserPublic) => void;
   clearAuth: () => void;
 }
 
@@ -252,6 +253,12 @@ export const useAuthStore = create<AuthState>()(
 
       // Helpers
       setError: (error) => set({ error }),
+
+      setUser: (user) =>
+        set({
+          user,
+          isAuthenticated: true,
+        }),
 
       clearAuth: () =>
         set({

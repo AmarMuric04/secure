@@ -47,7 +47,11 @@ export async function PUT(request: NextRequest) {
 
     // Ensure user has an authHash
     if (!user.authHash) {
-      return errorResponse("INVALID_PASSWORD", "Current password is incorrect", 401);
+      return errorResponse(
+        "INVALID_PASSWORD",
+        "Current password is incorrect",
+        401,
+      );
     }
 
     // Verify current password

@@ -1,12 +1,17 @@
 /**
- * User Registration API
- * POST /api/auth/register
+ * Confirm Email Verification API
+ * POST /api/auth/verify-email/confirm
+ *
+ * Verifies the code and completes user registration
  */
 
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db/connection";
-import { UserModel, CategoryModel } from "@/lib/db/models";
-import { registerSchema } from "@/lib/validations";
+import {
+  UserModel,
+  CategoryModel,
+  EmailVerificationTokenModel,
+} from "@/lib/db/models";
 import {
   hashAuthHash,
   generateAccessToken,
@@ -22,7 +27,8 @@ import {
   getClientIp,
   logAudit,
 } from "@/lib/api/utils";
-import type { UserPublic, RegisterRequest } from "@/types";
+import { z } from "zod";
+import type { UserPublic } from "@/types";
 
 // Default categories to create for new users
 const DEFAULT_CATEGORIES = [
@@ -34,14 +40,21 @@ const DEFAULT_CATEGORIES = [
   { name: "Social", icon: "🌐", color: "#06B6D4", order: 5 },
 ];
 
+const confirmVerificationSchema = z.object({
+  token: z.string().min(1, "Token is required"),
+  code: z.string().length(6, "Code must be 6 digits"),
+});
+
+type ConfirmVerificationRequest = z.infer<typeof confirmVerificationSchema>;
+
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting
+    // Rate limiting for verification attempts
     const ip = getClientIp(request);
-    const rateLimitKey = `register:${ip}`;
+    const rateLimitKey = `verify-confirm:${ip}`;
     const { allowed, error: rateLimitError } = await checkRateLimit(
       rateLimitKey,
-      "register",
+      "mfa", // Use MFA rate limit (5 attempts per 5 minutes)
     );
 
     if (!allowed) {
@@ -49,10 +62,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse and validate request body
-    const { data, error: parseError } = await parseBody<RegisterRequest>(
-      request,
-      registerSchema,
-    );
+    const { data, error: parseError } =
+      await parseBody<ConfirmVerificationRequest>(
+        request,
+        confirmVerificationSchema,
+      );
 
     if (parseError) {
       return parseError;
@@ -60,12 +74,58 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Check if user already exists (use lowercase for consistency)
+    // Find the verification token
+    const verificationToken = await EmailVerificationTokenModel.findOne({
+      token: data!.token,
+    });
+
+    if (!verificationToken) {
+      return errorResponse(
+        "INVALID_TOKEN",
+        "Invalid or expired verification token",
+        400,
+      );
+    }
+
+    // Check if token is expired
+    if (verificationToken.expiresAt < new Date()) {
+      await EmailVerificationTokenModel.deleteOne({ token: data!.token });
+      return errorResponse(
+        "TOKEN_EXPIRED",
+        "Verification token has expired. Please request a new one.",
+        400,
+      );
+    }
+
+    // Verify the code
+    if (verificationToken.code !== data!.code) {
+      return errorResponse("INVALID_CODE", "Invalid verification code", 400);
+    }
+
+    // Check if already verified (prevent double registration)
+    if (verificationToken.verified) {
+      return errorResponse(
+        "ALREADY_VERIFIED",
+        "This email has already been verified",
+        400,
+      );
+    }
+
+    // Check registration data exists
+    if (!verificationToken.registrationData) {
+      return errorResponse("INVALID_TOKEN", "Registration data not found", 400);
+    }
+
+    const { name, authHash, salt, encryptedVaultKey } =
+      verificationToken.registrationData;
+
+    // Double-check user doesn't exist (race condition protection)
     const existingUser = await UserModel.findOne({
-      email: data!.email.toLowerCase(),
+      email: verificationToken.email,
     });
 
     if (existingUser) {
+      await EmailVerificationTokenModel.deleteOne({ token: data!.token });
       return errorResponse(
         "EMAIL_EXISTS",
         "An account with this email already exists",
@@ -74,21 +134,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash the auth hash (additional server-side security)
-    const serverAuthHash = await hashAuthHash(data!.authHash);
+    const serverAuthHash = await hashAuthHash(authHash);
 
     // Generate recovery key
     const recoveryKey = generateRecoveryKey();
     const recoveryKeyHash = await hashString(recoveryKey);
 
-    // Create user
+    // Create user with verified email
     const user = await UserModel.create({
-      email: data!.email.toLowerCase(),
-      name: data!.name,
+      email: verificationToken.email,
+      name,
       authHash: serverAuthHash,
-      authSalt: data!.salt,
+      authSalt: salt,
       authProvider: "credentials",
-      encryptedVaultKey: data!.encryptedVaultKey,
+      encryptedVaultKey,
       recoveryKeyHash,
+      emailVerified: true,
+      emailVerifiedAt: new Date(),
       settings: {
         theme: "system",
         language: "en",
@@ -115,6 +177,9 @@ export async function POST(request: NextRequest) {
 
     await CategoryModel.insertMany(categoryDocs);
 
+    // Mark token as verified and delete it
+    await EmailVerificationTokenModel.deleteOne({ token: data!.token });
+
     // Generate tokens
     const userId = user._id.toString();
     const [accessToken, refreshToken] = await Promise.all([
@@ -126,7 +191,7 @@ export async function POST(request: NextRequest) {
     await logAudit(userId, "login", request, {
       resourceType: "user",
       resourceId: userId,
-      metadata: { type: "registration" },
+      metadata: { type: "registration", emailVerified: true },
     });
 
     // Prepare public user data
@@ -146,13 +211,13 @@ export async function POST(request: NextRequest) {
         accessToken,
         refreshToken,
         recoveryKey, // Only returned once at registration!
-        salt: data.salt,
-        encryptedVaultKey: data.encryptedVaultKey,
+        salt,
+        encryptedVaultKey,
       },
       201,
     );
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error("Confirm verification error:", error);
     return errorResponse("INTERNAL_ERROR", "An unexpected error occurred", 500);
   }
 }

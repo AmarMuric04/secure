@@ -5,7 +5,13 @@ import Link from "next/link";
 import { useLocalStorage } from "usehooks-ts";
 import { usePasswordsQuery, useCategoriesQuery } from "@/hooks";
 import { cn } from "@/lib/utils";
-import { Button, Input, Skeleton, DashboardWrapper, EmptyState } from "@/components/ui";
+import {
+  Button,
+  Input,
+  Skeleton,
+  DashboardWrapper,
+  EmptyState,
+} from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
 import {
   Tooltip,
@@ -374,7 +380,9 @@ export default function CategoriesPage() {
             {filteredCategories.length === 0 ? (
               <EmptyState
                 icon={<FolderOpen className="h-8 w-8 text-muted-foreground" />}
-                title={searchQuery ? "No categories found" : "No categories yet"}
+                title={
+                  searchQuery ? "No categories found" : "No categories yet"
+                }
                 description={
                   searchQuery
                     ? "Try adjusting your search"
@@ -433,15 +441,15 @@ export default function CategoriesPage() {
                         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <button className="p-2 rounded-2xl bg-background/90 backdrop-blur text-muted-foreground hover:text-foreground transition-colors shadow-md">
+                              <button className="p-2 rounded-xl bg-background/90 backdrop-blur text-muted-foreground hover:text-foreground transition-colors shadow-md">
                                 <MoreVertical className="h-4 w-4" />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align="end"
-                              className="rounded-2xl"
+                              className="rounded-lg"
                             >
-                              <DropdownMenuItem>
+                              <DropdownMenuItem className="rounded-md">
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit
                               </DropdownMenuItem>
@@ -453,7 +461,7 @@ export default function CategoriesPage() {
                                     category.isLocked,
                                   )
                                 }
-                                className="text-destructive focus:text-destructive"
+                                className="text-destructive focus:text-destructive rounded-md"
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete
@@ -464,7 +472,7 @@ export default function CategoriesPage() {
                       )}
 
                       {category.isDefault && (
-                        <span className="absolute top-3 right-3 text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-xl">
+                        <span className="absolute bottom-3 right-3 text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-lg">
                           Default
                         </span>
                       )}
@@ -502,7 +510,7 @@ export default function CategoriesPage() {
                               {category.name}
                             </p>
                             {category.isDefault && (
-                              <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-xl shrink-0">
+                              <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-lg shrink-0">
                                 Default
                               </span>
                             )}
@@ -517,15 +525,15 @@ export default function CategoriesPage() {
                       {!category.isLocked && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <button className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-2xl transition-all shrink-0">
+                            <button className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all shrink-0">
                               <MoreVertical className="h-4 w-4" />
                             </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent
                             align="end"
-                            className="rounded-2xl"
+                            className="rounded-lg"
                           >
-                            <DropdownMenuItem>
+                            <DropdownMenuItem className="rounded-md">
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
@@ -537,7 +545,7 @@ export default function CategoriesPage() {
                                   category.isLocked,
                                 )
                               }
-                              className="text-destructive focus:text-destructive"
+                              className="text-destructive focus:text-destructive rounded-md"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete

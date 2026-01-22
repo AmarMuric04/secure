@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { signIn } from "next-auth/react";
 import { deriveKeys } from "@/lib/crypto/client";
 import { useAuthStore } from "@/stores/auth.store";
 import { useVaultStore } from "@/stores/vault.store";
@@ -8,19 +9,28 @@ import { useVaultStore } from "@/stores/vault.store";
 interface UseAuthFlowReturn {
   isLoading: boolean;
   error: string | null;
+  pendingVerification: { token: string; email: string } | null;
   login: (email: string, masterPassword: string) => Promise<boolean>;
-  register: (
+  startRegistration: (
     email: string,
     masterPassword: string,
     displayName?: string,
-  ) => Promise<boolean>;
+  ) => Promise<{ success: boolean; token?: string }>;
+  completeRegistration: (code: string) => Promise<boolean>;
   verifyMfa: (code: string, isBackupCode?: boolean) => Promise<boolean>;
   logout: () => Promise<void>;
+  clearPendingVerification: () => void;
 }
 
 export function useAuthFlow(): UseAuthFlowReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingVerification, setPendingVerification] = useState<{
+    token: string;
+    email: string;
+    authHash: string;
+    encryptionKey: CryptoKey;
+  } | null>(null);
 
   const authStore = useAuthStore();
   const vaultStore = useVaultStore();
@@ -40,16 +50,16 @@ export function useAuthFlow(): UseAuthFlowReturn {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email }),
         });
-        
+
         if (!saltResponse.ok) {
           setError("Failed to fetch authentication data");
           setIsLoading(false);
           return false;
         }
-        
+
         const saltData = await saltResponse.json();
         const salt = saltData.data?.salt;
-        
+
         if (!salt) {
           setError("Invalid authentication data");
           setIsLoading(false);
@@ -57,7 +67,10 @@ export function useAuthFlow(): UseAuthFlowReturn {
         }
 
         // Step 2: Derive keys from master password using the fetched salt
-        const { authKey, encryptionKey } = await deriveKeys(masterPassword, salt);
+        const { authKey, encryptionKey } = await deriveKeys(
+          masterPassword,
+          salt,
+        );
 
         // Convert authKey to hex string for transmission
         const authKeyBytes = await crypto.subtle.exportKey("raw", authKey);
@@ -103,14 +116,14 @@ export function useAuthFlow(): UseAuthFlowReturn {
   );
 
   /**
-   * Complete registration flow with key generation
+   * Start registration flow - sends verification email
    */
-  const register = useCallback(
+  const startRegistration = useCallback(
     async (
       email: string,
       masterPassword: string,
       displayName?: string,
-    ): Promise<boolean> => {
+    ): Promise<{ success: boolean; token?: string }> => {
       setIsLoading(true);
       setError(null);
 
@@ -122,16 +135,10 @@ export function useAuthFlow(): UseAuthFlowReturn {
           .join("");
 
         // Step 2: Derive keys from master password using the salt
-        const { authKey, encryptionKey } = await deriveKeys(
+        const { authHash, encryptionKey } = await deriveKeys(
           masterPassword,
           salt,
         );
-
-        // Convert authKey to hex string for transmission
-        const authKeyBytes = await crypto.subtle.exportKey("raw", authKey);
-        const authHash = Array.from(new Uint8Array(authKeyBytes))
-          .map((b) => b.toString(16).padStart(2, "0"))
-          .join("");
 
         // Step 3: Generate a random vault key and encrypt it with the encryption key
         const vaultKey = crypto.getRandomValues(new Uint8Array(32));
@@ -150,31 +157,121 @@ export function useAuthFlow(): UseAuthFlowReturn {
             .map((b) => b.toString(16).padStart(2, "0"))
             .join("");
 
-        // Step 4: Call register API with all required data
-        const result = await authStore.register(
+        // Step 4: Send verification email with registration data
+        const response = await fetch("/api/auth/verify-email/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            name: displayName,
+            authHash,
+            salt,
+            encryptedVaultKey,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          setError(result.message || "Failed to send verification email");
+          setIsLoading(false);
+          return { success: false };
+        }
+
+        // Store pending verification data including authHash for NextAuth sign-in
+        setPendingVerification({
+          token: result.data.token,
           email,
           authHash,
-          salt,
-          encryptedVaultKey,
-          displayName,
-        );
+          encryptionKey,
+        });
 
-        if (!result.success) {
-          setError(authStore.error || "Registration failed");
+        setIsLoading(false);
+        return { success: true, token: result.data.token };
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "An error occurred";
+        setError(message);
+        setIsLoading(false);
+        return { success: false };
+      }
+    },
+    [],
+  );
+
+  /**
+   * Complete registration - verify code and create account
+   */
+  const completeRegistration = useCallback(
+    async (code: string): Promise<boolean> => {
+      if (!pendingVerification) {
+        setError("No pending verification. Please start registration again.");
+        return false;
+      }
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Verify the code and complete registration
+        const response = await fetch("/api/auth/verify-email/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token: pendingVerification.token,
+            code,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          setError(result.message || "Verification failed");
+          setIsLoading(false);
           return false;
         }
 
-        // Step 5: Set up vault with encryption key
-        vaultStore.setEncryptionKey(encryptionKey);
+        // Update auth store with the new user data
+        authStore.setUser(result.data.user);
+
+        // Sign in with NextAuth to create a proper session
+        const signInResult = await signIn("credentials", {
+          email: pendingVerification.email,
+          authHash: pendingVerification.authHash,
+          redirect: false,
+        });
+
+        if (signInResult?.error) {
+          console.error(
+            "NextAuth sign-in after registration failed:",
+            signInResult.error,
+          );
+          // Registration succeeded but session creation failed
+          // User will need to log in manually
+          setError("Account created. Please log in.");
+          setIsLoading(false);
+          return false;
+        }
+
+        // Set up vault with encryption key we saved
+        vaultStore.setEncryptionKey(pendingVerification.encryptionKey);
 
         // Save to sessionStorage so it survives page refresh
-        const exportedKey = await crypto.subtle.exportKey("jwk", encryptionKey);
+        const exportedKey = await crypto.subtle.exportKey(
+          "jwk",
+          pendingVerification.encryptionKey,
+        );
         sessionStorage.setItem("vault_key", JSON.stringify(exportedKey));
 
-        // Step 6: Fetch initial vault (will have default categories)
+        // Don't clear pending verification or set loading to false here
+        // This prevents a flash of the registration form before redirect
+        // The caller will handle navigation, and we want to keep the UI stable
+
+        // Fetch initial vault (will have default categories)
         await vaultStore.fetchVault();
 
-        setIsLoading(false);
+        // Return true but DON'T set isLoading to false - keep the loading state
+        // The page navigation will handle cleanup
         return true;
       } catch (err) {
         const message =
@@ -184,8 +281,16 @@ export function useAuthFlow(): UseAuthFlowReturn {
         return false;
       }
     },
-    [authStore, vaultStore],
+    [pendingVerification, authStore, vaultStore],
   );
+
+  /**
+   * Clear pending verification state
+   */
+  const clearPendingVerification = useCallback(() => {
+    setPendingVerification(null);
+    setError(null);
+  }, []);
 
   /**
    * MFA verification with vault unlock
@@ -243,9 +348,14 @@ export function useAuthFlow(): UseAuthFlowReturn {
   return {
     isLoading: isLoading || authStore.isLoading,
     error: error || authStore.error,
+    pendingVerification: pendingVerification
+      ? { token: pendingVerification.token, email: pendingVerification.email }
+      : null,
     login,
-    register,
+    startRegistration,
+    completeRegistration,
     verifyMfa,
     logout,
+    clearPendingVerification,
   };
 }
