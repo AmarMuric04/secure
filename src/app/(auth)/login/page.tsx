@@ -4,17 +4,11 @@ import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import {
-  Button,
-  Input,
-  PasswordInput,
-  Spinner,
-  Checkbox,
-} from "@/components/ui";
-import { useToast } from "@/components/ui/Toast";
+import { useToast, Spinner, Input, Button } from "@repo/ui";
+import { AuthLayout, LoginForm } from "@repo/auth";
 import { deriveKeys } from "@/lib/crypto/client";
 import { useVaultStore } from "@/stores";
-import { Mail, Lock, AlertCircle } from "lucide-react";
+// lucide icons removed - not used after migration
 
 // Google icon component
 function GoogleIcon({ className }: { className?: string }) {
@@ -46,11 +40,7 @@ function LoginContent() {
   const { addToast } = useToast();
   const { setEncryptionKey } = useVaultStore();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [showMfa, setShowMfa] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
 
@@ -69,97 +59,18 @@ function LoginContent() {
     }
   }, [sessionExpired, addToast]);
 
-  const handleCredentialsLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    if (!email || !password) {
-      addToast({
-        type: "error",
-        title: "Missing fields",
-        message: "Please enter your email and password",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      // Step 1: Fetch the user's salt from the server
-      const saltResponse = await fetch("/api/auth/salt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!saltResponse.ok) {
-        setError("Failed to connect to server");
-        addToast({
-          type: "error",
-          title: "Connection error",
-          message: "Failed to connect to server",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      const { data: saltData } = await saltResponse.json();
-      const salt = saltData.salt;
-
-      console.log("[Login] Retrieved salt:", salt.substring(0, 16) + "...");
-
-      // Step 2: Derive both auth hash AND encryption key using the correct salt
-      const { authHash, encryptionKey } = await deriveKeys(password, salt);
-
-      console.log("[Login] Derived keys using salt");
-
-      // Step 3: Authenticate with NextAuth
-      const result = await signIn("credentials", {
-        email,
-        authHash,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError("Invalid email or password");
-        addToast({
-          type: "error",
-          title: "Login failed",
-          message: "Invalid email or password",
-        });
-      } else if (result?.url?.includes("mfa=required")) {
-        // MFA is required
-        setShowMfa(true);
-      } else {
-        // Login successful - set the encryption key so vault can decrypt passwords
-        setEncryptionKey(encryptionKey);
-
-        // Store key in sessionStorage so it survives page refresh
-        const exportedKey = await crypto.subtle.exportKey("jwk", encryptionKey);
-        sessionStorage.setItem("vault_key", JSON.stringify(exportedKey));
-
-        addToast({
-          type: "success",
-          title: "Welcome back!",
-          message: "Successfully logged in",
-        });
-        router.push("/vault");
-        router.refresh();
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // credentials handled by reusable LoginForm via adapter below
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
     try {
       await signIn("google", { callbackUrl: "/vault" });
-    } catch {
-      setError("Failed to sign in with Google");
+    } catch (err) {
+      addToast({
+        type: "error",
+        title: "Google sign-in failed",
+        message: String(err) || "Failed to sign in with Google",
+      });
       setIsGoogleLoading(false);
     }
   };
@@ -190,12 +101,14 @@ function LoginContent() {
             type="text"
             placeholder="000000"
             value={mfaCode}
-            onChange={(e) => setMfaCode(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setMfaCode(e.target.value)
+            }
             maxLength={6}
             className="text-center text-2xl tracking-widest"
           />
 
-          <Button type="submit" className="w-full" isLoading={isLoading}>
+          <Button type="submit" className="w-full" isLoading={false}>
             Verify
           </Button>
 
@@ -213,106 +126,78 @@ function LoginContent() {
       </div>
     );
   }
+  // Render reusable auth UI: Google button + LoginForm using an adapter for credentials
+  const adapter = {
+    signIn: async ({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }) => {
+      // fetch salt
+      const saltResponse = await fetch("/api/auth/salt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!saltResponse.ok) throw new Error("Failed to fetch salt");
+      const { data: saltData } = await saltResponse.json();
+      const salt = saltData.salt;
+      const { authHash, encryptionKey } = await deriveKeys(password, salt);
+      const result = await signIn("credentials", {
+        email,
+        authHash,
+        redirect: false,
+      });
+      if (result?.error) throw new Error(result.error as string);
+      // persist encryption key
+      const exportedKey = await crypto.subtle.exportKey("jwk", encryptionKey);
+      sessionStorage.setItem("vault_key", JSON.stringify(exportedKey));
+      setEncryptionKey(encryptionKey);
+    },
+  };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 sm:p-10">
-      <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-        Welcome back
-      </h2>
-      <p className="text-gray-500 dark:text-gray-400 text-lg mb-8">
-        Sign in to access your vault
-      </p>
-
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3 text-red-600 dark:text-red-400">
-          <AlertCircle className="h-5 w-5 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {/* Google Sign In */}
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full h-12 text-base font-medium rounded-xl mb-8 gap-3"
-        onClick={handleGoogleLogin}
-        isLoading={isGoogleLoading}
-      >
-        <GoogleIcon className="h-5 w-5" />
-        Continue with Google
-      </Button>
-
-      <div className="relative mb-8">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200 dark:border-gray-700" />
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="bg-white dark:bg-gray-900 px-4 text-gray-500 font-medium">
-            or continue with email
-          </span>
-        </div>
-      </div>
-
-      <form onSubmit={handleCredentialsLogin} className="space-y-5">
-        <div className="relative">
-          <Mail className="absolute left-4 top-10 h-5 w-5 text-gray-400" />
-          <Input
-            label="Email"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="pl-12 h-12 rounded-xl text-base"
-          />
+    <AuthLayout>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-3xl font-bold">Welcome back</h2>
+          <p className="text-muted-foreground">Sign in to access your vault</p>
         </div>
 
-        <div className="relative">
-          <Lock className="absolute left-4 top-10 h-5 w-5 text-gray-400 z-10" />
-          <PasswordInput
-            label="Master Password"
-            placeholder="Enter your master password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="pl-12 h-12 rounded-xl text-base"
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <Checkbox className="border-input" />
-            <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-              Remember me
-            </span>
-          </label>
-          <Link
-            href="/forgot-password"
-            className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
+        <div>
+          <button
+            type="button"
+            className="w-full h-12 rounded-xl border px-3 flex items-center justify-center gap-3"
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoading}
           >
-            Forgot password?
+            {isGoogleLoading ? (
+              <Spinner className="h-5 w-5" />
+            ) : (
+              <GoogleIcon className="h-5 w-5" />
+            )}
+            Continue with Google
+          </button>
+        </div>
+
+        <div className="text-center text-sm text-muted-foreground">
+          or continue with email
+        </div>
+
+        <LoginForm adapter={adapter} onSuccess={() => router.push("/vault")} />
+
+        <div className="text-center">
+          <span className="text-muted-foreground">
+            Don&apos;t have an account?{" "}
+          </span>
+          <Link href="/register" className="text-primary font-semibold">
+            Create one
           </Link>
         </div>
-
-        <Button
-          type="submit"
-          className="w-full h-12 text-base font-semibold rounded-xl"
-          isLoading={isLoading}
-        >
-          Sign In
-        </Button>
-      </form>
-
-      <div className="mt-8 text-center">
-        <span className="text-gray-500 dark:text-gray-400">
-          Don&apos;t have an account?{" "}
-        </span>
-        <Link
-          href="/register"
-          className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
-        >
-          Create one
-        </Link>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
 

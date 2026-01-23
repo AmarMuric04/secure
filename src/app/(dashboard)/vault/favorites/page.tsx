@@ -11,20 +11,16 @@ import {
   Skeleton,
   DashboardWrapper,
   EmptyState,
-} from "@/components/ui";
-import { useToast } from "@/components/ui/Toast";
-import {
+  useToast,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@repo/ui";
 import {
   Key,
   Star,

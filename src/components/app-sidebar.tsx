@@ -30,8 +30,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/Button";
+  Button,
+} from "@repo/ui";
 
 const vaultNavigation = [
   { name: "All Passwords", href: "/vault", icon: Key },

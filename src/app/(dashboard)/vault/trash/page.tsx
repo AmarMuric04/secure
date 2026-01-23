@@ -21,8 +21,8 @@ import {
   Skeleton,
   LongCard,
   EmptyState,
-} from "@/components/ui";
-import { useToast } from "@/components/ui/Toast";
+  useToast,
+} from "@repo/ui";
 
 export default function TrashPage() {
   const { addToast } = useToast();

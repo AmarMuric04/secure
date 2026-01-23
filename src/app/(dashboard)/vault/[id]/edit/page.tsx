@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
   EmptyState,
-} from "@/components/ui";
+} from "@repo/ui";
 import { usePasswordsQuery, useCategoriesQuery } from "@/hooks";
 import { cn } from "@/lib/utils";
 

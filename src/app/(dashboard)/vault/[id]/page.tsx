@@ -27,7 +27,7 @@ import {
   ConfirmDialog,
   DashboardWrapper,
   EmptyState,
-} from "@/components/ui";
+} from "@repo/ui";
 import { usePasswordsQuery, useCategoriesQuery } from "@/hooks";
 import { formatRelativeTime, getFaviconUrl } from "@/lib/utils";
 

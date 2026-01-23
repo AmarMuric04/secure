@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3003",
+    "dev": "next dev --port 3000nr",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -19,6 +19,8 @@
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@repo/auth": "workspace:*",
+    "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.90.19",
     "@types/qrcode.react": "^3.0.0",
     "bcryptjs": "^3.0.3",

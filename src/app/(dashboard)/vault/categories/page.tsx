@@ -11,19 +11,15 @@ import {
   Skeleton,
   DashboardWrapper,
   EmptyState,
-} from "@/components/ui";
-import { useToast } from "@/components/ui/Toast";
-import {
+  useToast,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@repo/ui";
 import type { Category } from "@/types";
 import {
   FolderOpen,

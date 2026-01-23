@@ -10,7 +10,7 @@ import {
   MetricCard,
   ChartCard,
   EmptyState,
-} from "@/components/ui";
+} from "@repo/ui";
 import {
   PieChart,
   Pie,

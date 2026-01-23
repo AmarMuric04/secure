@@ -11,8 +11,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui";
-import { useToast } from "@/components/ui/Toast";
+  useToast,
+} from "@repo/ui";
 import { usePasswordsQuery, useCategoriesQuery } from "@/hooks";
 import { cn } from "@/lib/utils";
 import {

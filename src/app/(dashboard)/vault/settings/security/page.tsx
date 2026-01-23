@@ -18,7 +18,7 @@ import {
   PasswordInput,
   Modal,
   DashboardWrapper,
-} from "@/components/ui";
+} from "@repo/ui";
 import Link from "next/link";
 
 interface MfaSetupData {

@@ -12,25 +12,19 @@ import {
   DashboardWrapper,
   Skeleton,
   EmptyState,
-} from "@/components/ui";
-import { useToast } from "@/components/ui/Toast";
-import {
+  useToast,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from "@repo/ui";
 import type { DecryptedPasswordEntry } from "@/stores";
 import {
   Key,

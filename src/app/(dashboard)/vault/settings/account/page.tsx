@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { ArrowLeft, Trash2, AlertTriangle, UserX } from "lucide-react";
-import { Button, Input, Modal, DashboardWrapper } from "@/components/ui";
+import { Button, Input, Modal, DashboardWrapper } from "@repo/ui";
 
 export default function AccountSettingsPage() {
   // Delete account modal state

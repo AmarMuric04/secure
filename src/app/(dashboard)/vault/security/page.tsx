@@ -19,7 +19,7 @@ import {
   MetricCard,
   LongCard,
   EmptyState,
-} from "@/components/ui";
+} from "@repo/ui";
 import { formatRelativeTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 

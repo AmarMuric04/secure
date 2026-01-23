@@ -12,7 +12,7 @@ import {
   ArrowRight,
   Check,
 } from "lucide-react";
-import { Button } from "@/components/ui";
+import { Button } from "@repo/ui";
 
 const features = [
   {

@@ -14,9 +14,7 @@ import {
   FileText,
   Lock,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { DashboardWrapper } from "@/components/ui/DashboardWrapper";
-import { Modal } from "@/components/ui/Modal";
+import { Button, DashboardWrapper, Modal } from "@repo/ui";
 import { usePasswordsQuery, useCategoriesQuery } from "@/hooks";
 
 export default function SettingsPage() {

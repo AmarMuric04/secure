@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, User, Loader2, Check } from "lucide-react";
-import { Button, Input, DashboardWrapper } from "@/components/ui";
+import { Button, Input, DashboardWrapper } from "@repo/ui";
 import Link from "next/link";
 
 export default function ProfileSettingsPage() {

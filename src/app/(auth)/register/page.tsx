@@ -3,11 +3,10 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { Button, Input, PasswordInput, Checkbox } from "@/components/ui";
-import { useToast } from "@/components/ui/Toast";
+import { Button, useToast } from "@repo/ui";
+import { AuthLayout, RegisterForm } from "@repo/auth";
 import { useAuthFlow } from "@/hooks";
-import { calculatePasswordStrength } from "@/lib/crypto/client";
-import { Mail, Lock, User, AlertCircle, Check, ArrowLeft } from "lucide-react";
+import { Mail, AlertCircle, ArrowLeft } from "lucide-react";
 
 // Google icon component
 function GoogleIcon({ className }: { className?: string }) {
@@ -111,27 +110,9 @@ export default function RegisterPage() {
     error,
   } = useAuthFlow();
 
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [resendCountdown, setResendCountdown] = useState(0);
-
-  const strength = calculatePasswordStrength(password);
-
-  const passwordRequirements = [
-    { label: "At least 12 characters", met: password.length >= 12 },
-    { label: "Contains uppercase letter", met: /[A-Z]/.test(password) },
-    { label: "Contains lowercase letter", met: /[a-z]/.test(password) },
-    { label: "Contains number", met: /[0-9]/.test(password) },
-    {
-      label: "Contains special character",
-      met: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-    },
-  ];
 
   // Countdown timer for resend
   useEffect(() => {
@@ -157,73 +138,6 @@ export default function RegisterPage() {
       setIsGoogleLoading(false);
     }
   };
-
-  const handleStartRegistration = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-
-      if (!email || !password) {
-        addToast({
-          type: "error",
-          title: "Missing fields",
-          message: "Please fill in all required fields",
-        });
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        addToast({
-          type: "error",
-          title: "Passwords don't match",
-          message: "Please make sure your passwords match",
-        });
-        return;
-      }
-
-      if (strength.score < 2) {
-        addToast({
-          type: "warning",
-          title: "Weak password",
-          message: "Please choose a stronger master password",
-        });
-        return;
-      }
-
-      if (!acceptedTerms) {
-        addToast({
-          type: "error",
-          title: "Terms required",
-          message: "Please accept the terms and conditions",
-        });
-        return;
-      }
-
-      const result = await startRegistration(
-        email,
-        password,
-        name || undefined,
-      );
-
-      if (result.success) {
-        addToast({
-          type: "success",
-          title: "Verification email sent!",
-          message: "Please check your inbox for the verification code",
-        });
-        setResendCountdown(60); // 60 second cooldown before resend
-      }
-    },
-    [
-      email,
-      password,
-      confirmPassword,
-      name,
-      acceptedTerms,
-      strength.score,
-      startRegistration,
-      addToast,
-    ],
-  );
 
   const handleVerifyCode = useCallback(
     async (e: React.FormEvent) => {
@@ -254,23 +168,38 @@ export default function RegisterPage() {
   const handleResendCode = useCallback(async () => {
     if (resendCountdown > 0) return;
 
-    const result = await startRegistration(email, password, name || undefined);
-
-    if (result.success) {
-      addToast({
-        type: "success",
-        title: "Code resent!",
-        message: "Please check your inbox for the new verification code",
-      });
-      setResendCountdown(60);
-      setVerificationCode("");
-    }
-  }, [email, password, name, resendCountdown, startRegistration, addToast]);
+    // Since we now capture email/password via the reusable form, we cannot resend easily; user will need to re-enter
+    addToast({
+      type: "info",
+      title: "Resend unavailable",
+      message: "Please restart registration if code expired",
+    });
+  }, [resendCountdown, addToast]);
 
   const handleBackToForm = useCallback(() => {
     clearPendingVerification();
     setVerificationCode("");
   }, [clearPendingVerification]);
+
+  const adapter = {
+    signUp: async ({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }) => {
+      const result = await startRegistration(email, password, undefined);
+      if (!result.success) throw new Error("Registration failed");
+      addToast({
+        type: "success",
+        title: "Verification email sent!",
+        message: "Please check your inbox for the verification code",
+      });
+      setResendCountdown(60);
+      return result;
+    },
+  };
 
   // Show verification step if we have pending verification
   if (pendingVerification) {
@@ -351,164 +280,49 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 sm:p-10">
-      <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-        Create your vault
-      </h2>
-      <p className="text-gray-500 dark:text-gray-400 text-lg mb-8">
-        Set up your secure password manager
-      </p>
-
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3 text-red-600 dark:text-red-400">
-          <AlertCircle className="h-5 w-5 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {/* Google Sign Up */}
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full h-12 text-base font-medium rounded-xl mb-8 gap-3"
-        onClick={handleGoogleSignUp}
-        isLoading={isGoogleLoading}
-      >
-        <GoogleIcon className="h-5 w-5" />
-        Continue with Google
-      </Button>
-
-      <div className="relative mb-8">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200 dark:border-gray-700" />
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="bg-white dark:bg-gray-900 px-4 text-gray-500 font-medium">
-            or create with email
-          </span>
-        </div>
-      </div>
-
-      <form onSubmit={handleStartRegistration} className="space-y-5">
-        <div className="relative">
-          <Mail className="absolute left-4 top-10 h-5 w-5 text-gray-400" />
-          <Input
-            label="Email"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="pl-12 h-12 rounded-xl text-base"
-          />
-        </div>
-
-        <div className="relative">
-          <User className="absolute left-4 top-10 h-5 w-5 text-gray-400" />
-          <Input
-            label="Display Name (optional)"
-            type="text"
-            placeholder="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="pl-12 h-12 rounded-xl text-base"
-          />
-        </div>
-
-        <div className="relative">
-          <Lock className="absolute left-4 top-10 h-5 w-5 text-gray-400 z-10" />
-          <PasswordInput
-            label="Master Password"
-            placeholder="Create a strong master password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="pl-12 h-12 rounded-xl text-base"
-            showStrength
-            strength={strength.score as 0 | 1 | 2 | 3 | 4}
-          />
-        </div>
-
-        {/* Password requirements */}
-        {password && (
-          <div className="space-y-1">
-            {passwordRequirements.map((req, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm">
-                <Check
-                  className={`h-4 w-4 ${
-                    req.met
-                      ? "text-green-500"
-                      : "text-gray-300 dark:text-gray-600"
-                  }`}
-                />
-                <span
-                  className={
-                    req.met
-                      ? "text-gray-700 dark:text-gray-300"
-                      : "text-gray-400"
-                  }
-                >
-                  {req.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div className="relative">
-          <Lock className="absolute left-4 top-10 h-5 w-5 text-gray-400 z-10" />
-          <PasswordInput
-            label="Confirm Master Password"
-            placeholder="Repeat your master password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="pl-12 h-12 rounded-xl text-base"
-            error={
-              confirmPassword && password !== confirmPassword
-                ? "Passwords do not match"
-                : undefined
-            }
-          />
-        </div>
-
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
-          <p className="text-sm text-yellow-800 dark:text-yellow-200">
-            <strong>Important:</strong> Your master password cannot be
-            recovered. If you forget it, you will lose access to your vault.
-            Consider writing it down and storing it securely.
+    <AuthLayout>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-3xl font-bold">Create your vault</h2>
+          <p className="text-muted-foreground">
+            Set up your secure password manager
           </p>
         </div>
 
-        <label className="flex items-start gap-3 cursor-pointer group">
-          <Checkbox
-            checked={acceptedTerms}
-            onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
-            className="mt-1"
-          />
-          <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors leading-relaxed">
-            I understand that SecureVault uses zero-knowledge encryption and
-            cannot recover my master password.
-          </span>
-        </label>
-
+        {/* Google Sign Up */}
         <Button
-          type="submit"
-          className="w-full h-12 text-base font-semibold rounded-xl"
-          isLoading={isLoading}
+          type="button"
+          variant="outline"
+          className="w-full h-12 text-base font-medium rounded-xl gap-3"
+          onClick={handleGoogleSignUp}
+          isLoading={isGoogleLoading}
         >
-          Continue
+          <GoogleIcon className="h-5 w-5" />
+          Continue with Google
         </Button>
-      </form>
 
-      <div className="mt-8 text-center">
-        <span className="text-gray-500 dark:text-gray-400">
-          Already have an account?{" "}
-        </span>
-        <Link
-          href="/login"
-          className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
-        >
-          Sign in
-        </Link>
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-white dark:bg-gray-900 px-4 text-gray-500 font-medium">
+              or create with email
+            </span>
+          </div>
+        </div>
+
+        <RegisterForm adapter={adapter} />
+
+        <div className="text-center">
+          <span className="text-muted-foreground">
+            Already have an account?{" "}
+          </span>
+          <Link href="/login" className="text-primary font-semibold">
+            Sign in
+          </Link>
+        </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
