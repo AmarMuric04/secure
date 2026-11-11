@@ -1,0 +1,1 @@
+export { FavoriteStar } from "./FavoriteStar";

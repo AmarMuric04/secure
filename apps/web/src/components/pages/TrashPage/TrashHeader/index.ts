@@ -1,0 +1,1 @@
+export { TrashHeader } from "./TrashHeader";

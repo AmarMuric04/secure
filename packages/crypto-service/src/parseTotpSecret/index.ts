@@ -1,0 +1,1 @@
+export { parseTotpSecret } from "./parseTotpSecret";

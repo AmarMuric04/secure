@@ -1,0 +1,1 @@
+export { SealedChapter } from "./SealedChapter";

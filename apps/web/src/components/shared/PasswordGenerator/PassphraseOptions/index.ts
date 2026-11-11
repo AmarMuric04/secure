@@ -1,0 +1,1 @@
+export { PassphraseOptions } from "./PassphraseOptions";

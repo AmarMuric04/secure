@@ -1,0 +1,28 @@
+{
+	"name": "business-logic-secure",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit",
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
+		"clean": "rimraf .turbo node_modules"
+	},
+	"dependencies": {
+		"@tanstack/react-query": "^5.105.1",
+		"crypto-service": "workspace:*",
+		"react": "^19.2.3",
+		"secure-service": "workspace:*",
+		"zod": "^4.6.7"
+	},
+	"devDependencies": {
+		"@types/react": "^19.2.7",
+		"eslint-config-base": "workspace:*",
+		"typescript": "~5.7.2",
+		"typescript-config": "workspace:*"
+	}
+}

@@ -1,0 +1,1 @@
+export { TrashSkeleton } from "./TrashSkeleton";

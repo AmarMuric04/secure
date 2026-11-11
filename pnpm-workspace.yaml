@@ -1,7 +1,0 @@
-packages:
-  - .
-
-ignoredBuiltDependencies:
-  - argon2
-  - sharp
-  - unrs-resolver

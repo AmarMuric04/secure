@@ -1,0 +1,1 @@
+export { EntryMonogram } from "./EntryMonogram";

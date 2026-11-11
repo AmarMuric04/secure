@@ -1,0 +1,1 @@
+export { unlockVaultKey } from "./unlockVaultKey";

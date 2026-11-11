@@ -1,0 +1,1 @@
+export { createVaultKey } from "./createVaultKey";

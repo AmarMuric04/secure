@@ -1,0 +1,68 @@
+{
+	"$schema": "https://unpkg.com/syncpack@latest/dist/schema.json",
+	"sortFirst": [
+		"name",
+		"version",
+		"private",
+		"type",
+		"main",
+		"exports",
+		"sideEffects",
+		"scripts",
+		"dependencies",
+		"devDependencies",
+		"peerDependencies"
+	],
+	"versionGroups": [
+		{
+			"label": "Internal packages",
+			"packages": [
+				"**"
+			],
+			"dependencies": [
+				"business-logic-*",
+				"crypto-service",
+				"eslint-config-base",
+				"eslint-config-react",
+				"formatting-service",
+				"secure-api",
+				"secure-service",
+				"typescript-config"
+			],
+			"dependencyTypes": [
+				"prod",
+				"dev"
+			],
+			"pinVersion": "workspace:*"
+		},
+		{
+			"label": "TypeScript",
+			"dependencies": [
+				"typescript"
+			],
+			"pinVersion": "~5.7.2"
+		},
+		{
+			"label": "React",
+			"dependencies": [
+				"react",
+				"react-dom"
+			],
+			"pinVersion": "^19.2.3"
+		},
+		{
+			"label": "Zod",
+			"dependencies": [
+				"zod"
+			],
+			"pinVersion": "^4.6.7"
+		},
+		{
+			"label": "TanStack Query",
+			"dependencies": [
+				"@tanstack/react-query"
+			],
+			"pinVersion": "^5.105.1"
+		}
+	]
+}

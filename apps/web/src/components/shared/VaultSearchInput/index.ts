@@ -1,0 +1,1 @@
+export { VaultSearchInput } from "./VaultSearchInput";

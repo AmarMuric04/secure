@@ -1,0 +1,1 @@
+export { rewrapVaultKey } from "./rewrapVaultKey";

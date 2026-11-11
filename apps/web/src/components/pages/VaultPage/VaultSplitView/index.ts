@@ -1,0 +1,1 @@
+export { VaultSplitView } from "./VaultSplitView";

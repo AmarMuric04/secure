@@ -1,0 +1,1 @@
+export { generatePassphrase } from "./generatePassphrase";

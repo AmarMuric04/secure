@@ -1,0 +1,1 @@
+export { VaultEntryAvatar } from "./VaultEntryAvatar";

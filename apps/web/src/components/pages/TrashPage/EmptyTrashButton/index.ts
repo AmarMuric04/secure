@@ -1,0 +1,1 @@
+export { EmptyTrashButton } from "./EmptyTrashButton";

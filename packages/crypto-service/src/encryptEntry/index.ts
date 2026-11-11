@@ -1,0 +1,1 @@
+export { encryptEntry } from "./encryptEntry";

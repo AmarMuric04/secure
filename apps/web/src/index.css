@@ -1,0 +1,228 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+	--font-mono: "Geist Mono Variable", ui-monospace, monospace;
+	--color-sidebar-ring: var(--sidebar-ring);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar: var(--sidebar);
+	--color-chart-5: var(--chart-5);
+	--color-chart-1-ink: var(--chart-1-ink);
+	--color-chart-2-ink: var(--chart-2-ink);
+	--color-chart-3-ink: var(--chart-3-ink);
+	--color-chart-4-ink: var(--chart-4-ink);
+	--color-chart-5-ink: var(--chart-5-ink);
+	--color-chart-4: var(--chart-4);
+	--color-chart-3: var(--chart-3);
+	--color-chart-2: var(--chart-2);
+	--color-chart-1: var(--chart-1);
+	--color-ring: var(--ring);
+	--color-input: var(--input);
+	--color-border: var(--border);
+	--color-destructive: var(--destructive);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-accent: var(--accent);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-muted: var(--muted);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-secondary: var(--secondary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-primary: var(--primary);
+	--color-primary-soft: var(--primary-soft);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-popover: var(--popover);
+	--color-card-foreground: var(--card-foreground);
+	--color-card: var(--card);
+	--color-subtle: var(--subtle);
+	--color-warning: var(--warning);
+	--color-warning-soft: var(--warning-soft);
+	--color-success: var(--success);
+	--color-band: var(--band);
+	--color-band-foreground: var(--band-foreground);
+	--color-band-muted: var(--band-muted);
+	--color-sand: var(--sand);
+	--color-sand-ink: var(--sand-ink);
+	--shadow-panel: var(--panel-shadow);
+	--shadow-pop: var(--pop-shadow);
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+	--radius-2xl: calc(var(--radius) + 8px);
+	--radius-3xl: calc(var(--radius) + 12px);
+	--radius-4xl: calc(var(--radius) + 16px);
+	--ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+	--ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+	--ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:root {
+	--radius: 0.625rem;
+	--background: #f3f2ee;
+	--foreground: #1c1b18;
+	--card: #ffffff;
+	--card-foreground: #1c1b18;
+	--popover: #ffffff;
+	--popover-foreground: #1c1b18;
+	--primary: #1f5c4f;
+	--primary-foreground: #ffffff;
+	--primary-soft: #e3eeea;
+	--secondary: #f2f1ed;
+	--secondary-foreground: #1c1b18;
+	--muted: #f7f6f3;
+	--muted-foreground: #64625b;
+	--subtle: #9a978e;
+	--accent: #ecebe6;
+	--accent-foreground: #1c1b18;
+	--destructive: #b03a2e;
+	--warning: #9a5b0c;
+	--warning-soft: #fbf1df;
+	--success: #2e7d5b;
+	--band: #1f5c4f;
+	--band-foreground: #f3f2ee;
+	--band-muted: #a9c8bd;
+	--sand: #ebe6da;
+	--sand-ink: #d8d0bf;
+	--border: #e9e7e1;
+	--input: #dcdad3;
+	--ring: #1f5c4f;
+	--chart-1: #d9e9e2;
+	--chart-2: #a8cdbf;
+	--chart-3: #6ea594;
+	--chart-4: #3b7d6b;
+	--chart-5: #1f5c4f;
+	--chart-1-ink: #1c1b18;
+	--chart-2-ink: #1c1b18;
+	--chart-3-ink: #1c1b18;
+	--chart-4-ink: #ffffff;
+	--chart-5-ink: #ffffff;
+	--sidebar: #f3f2ee;
+	--sidebar-foreground: #1c1b18;
+	--sidebar-primary: #1f5c4f;
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: #e9e8e3;
+	--sidebar-accent-foreground: #1c1b18;
+	--sidebar-border: #e9e7e1;
+	--sidebar-ring: #1f5c4f;
+	--panel-shadow:
+		0 0 0 1px rgb(28 27 24 / 0.04), 0 1px 2px rgb(28 27 24 / 0.05);
+	--pop-shadow:
+		0 0 0 1px rgb(28 27 24 / 0.06), 0 16px 48px rgb(28 27 24 / 0.16),
+		0 2px 8px rgb(28 27 24 / 0.06);
+}
+
+.dark {
+	--background: #0f100f;
+	--foreground: #ecebe6;
+	--card: #181917;
+	--card-foreground: #ecebe6;
+	--popover: #1e1f1d;
+	--popover-foreground: #ecebe6;
+	--primary: #76c2ac;
+	--primary-foreground: #0e1a16;
+	--primary-soft: #1a2d27;
+	--secondary: #1e1f1d;
+	--secondary-foreground: #ecebe6;
+	--muted: #1e1f1d;
+	--muted-foreground: #a3a199;
+	--subtle: #6f6d66;
+	--accent: #252624;
+	--accent-foreground: #ecebe6;
+	--destructive: #eb7a6e;
+	--warning: #e2a54b;
+	--warning-soft: #2b2213;
+	--success: #74c49b;
+	--band: #12302a;
+	--band-foreground: #ecebe6;
+	--band-muted: #86b3a4;
+	--sand: #1c1a16;
+	--sand-ink: #2c2922;
+	--border: #2a2b28;
+	--input: #383935;
+	--ring: #76c2ac;
+	--chart-1: #213c34;
+	--chart-2: #2f5a4e;
+	--chart-3: #4a8a77;
+	--chart-4: #66b29b;
+	--chart-5: #95d6c1;
+	--chart-1-ink: #ecebe6;
+	--chart-2-ink: #ecebe6;
+	--chart-3-ink: #0e1a16;
+	--chart-4-ink: #0e1a16;
+	--chart-5-ink: #0e1a16;
+	--sidebar: #0f100f;
+	--sidebar-foreground: #ecebe6;
+	--sidebar-primary: #76c2ac;
+	--sidebar-primary-foreground: #0e1a16;
+	--sidebar-accent: #1e1f1d;
+	--sidebar-accent-foreground: #ecebe6;
+	--sidebar-border: #2a2b28;
+	--sidebar-ring: #76c2ac;
+	--panel-shadow: 0 0 0 1px rgb(255 255 255 / 0.04);
+	--pop-shadow:
+		0 0 0 1px rgb(255 255 255 / 0.07), 0 20px 60px rgb(0 0 0 / 0.5);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground antialiased;
+	}
+}
+
+@keyframes dial-dot-in {
+	0% {
+		opacity: 0;
+		transform: translateY(6px) scale(0.2);
+	}
+	60% {
+		opacity: 1;
+		transform: scale(1.15);
+	}
+	100% {
+		transform: none;
+	}
+}
+
+@keyframes caret-blink {
+	50% {
+		opacity: 0;
+	}
+}
+
+@keyframes button-shine {
+	from {
+		transform: translateX(-150%) skewX(-20deg);
+	}
+	to {
+		transform: translateX(350%) skewX(-20deg);
+	}
+}
+
+@keyframes hint-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+}
+
+@keyframes rise-in {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+}

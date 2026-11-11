@@ -1,0 +1,1 @@
+export { sealLegacyVaultKey } from "./sealLegacyVaultKey";
