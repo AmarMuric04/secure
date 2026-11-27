@@ -1,9 +1,7 @@
 import { generateTotpCode, parseTotpSecret } from "business-logic-secure";
-import { Copy } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui";
-import { useCopySecret } from "@/lib/useCopySecret";
+import { CopyButton } from "@/components/shared/CopyButton";
 import { cn } from "@/lib/utils";
 
 const RING_RADIUS = 9;
@@ -14,8 +12,6 @@ const formatCode = (code: string) =>
 	code.length === 6 ? `${code.slice(0, 3)} ${code.slice(3)}` : code;
 
 const TotpCodeRow: React.FC<{ secret: string }> = ({ secret }) => {
-	const copySecret = useCopySecret();
-
 	const [current, setCurrent] = useState<{
 		code: string;
 		secondsRemaining: number;
@@ -112,19 +108,11 @@ const TotpCodeRow: React.FC<{ secret: string }> = ({ secret }) => {
 				/>
 			</svg>
 
-			<Button
-				variant="ghost"
-				size="icon-sm"
-				aria-label="Copy 2FA code"
-				disabled={!current}
-				className="rounded-lg text-muted-foreground"
-				onClick={() =>
-					current &&
-					void copySecret({ value: current.code, label: "2FA code" })
-				}
-			>
-				<Copy />
-			</Button>
+			<CopyButton
+				value={current?.code ?? ""}
+				label="2FA code"
+				className="rounded-lg"
+			/>
 		</div>
 	);
 };

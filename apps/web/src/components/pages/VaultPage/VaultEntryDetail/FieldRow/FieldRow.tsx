@@ -1,8 +1,8 @@
-import { Copy, ExternalLink, Eye, EyeOff } from "lucide-react";
+import { ExternalLink, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
+import { CopyButton } from "@/components/shared/CopyButton";
 import { Button } from "@/components/ui";
-import { useCopySecret } from "@/lib/useCopySecret";
 import { cn } from "@/lib/utils";
 
 const MASK_LENGTH = 16;
@@ -26,19 +26,9 @@ const FieldRow: React.FC<{
 	children,
 	onCopied,
 }) => {
-	const copySecret = useCopySecret();
-
 	const [isRevealed, setIsRevealed] = useState(false);
 
 	const isMasked = isSecret && !isRevealed;
-
-	const handleCopy = async () => {
-		const isCopied = await copySecret({ value, label });
-
-		if (isCopied && onCopied) {
-			onCopied();
-		}
-	};
 
 	return (
 		<div className="group/field flex min-h-15.5 items-center gap-3 py-3 pr-2.5 pl-4 not-first:border-t">
@@ -76,15 +66,12 @@ const FieldRow: React.FC<{
 				)}
 
 				{isCopyable && (
-					<Button
-						variant="ghost"
-						size="icon-sm"
-						aria-label={`Copy ${label}`}
-						className="rounded-lg text-muted-foreground"
-						onClick={() => void handleCopy()}
-					>
-						<Copy />
-					</Button>
+					<CopyButton
+						value={value}
+						label={label}
+						className="rounded-lg"
+						onCopied={onCopied}
+					/>
 				)}
 
 				{href && (

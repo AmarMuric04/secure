@@ -1,12 +1,11 @@
 import { secure } from "business-logic-secure";
-import { Copy } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
 
 import { CodeInput } from "@/components/shared/CodeInput";
+import { CopyButton } from "@/components/shared/CopyButton";
 import { FormError } from "@/components/shared/FormError";
 import { Button, Modal, Spinner } from "@/components/ui";
-import { useCopySecret } from "@/lib/useCopySecret";
 
 const MfaSetupForm: React.FC<{
 	onCancel: () => void;
@@ -14,7 +13,6 @@ const MfaSetupForm: React.FC<{
 }> = ({ onCancel, onEnabled }) => {
 	const mfaSetup = secure.user.useMfaSetup({ enabled: true });
 	const enableMfa = secure.user.useEnableMfa();
-	const copySecret = useCopySecret();
 
 	const [code, setCode] = useState("");
 
@@ -79,17 +77,7 @@ const MfaSetupForm: React.FC<{
 					<code className="min-w-0 flex-1 font-mono text-[13px] tracking-wide break-all">
 						{secret}
 					</code>
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon-sm"
-						aria-label="Copy secret"
-						onClick={() =>
-							copySecret({ value: secret, label: "Secret" })
-						}
-					>
-						<Copy />
-					</Button>
+					<CopyButton value={secret} label="Secret" />
 				</div>
 			</div>
 

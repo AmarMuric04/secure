@@ -1,7 +1,7 @@
-import { AlertTriangle, Copy, Download } from "lucide-react";
+import { AlertTriangle, Download } from "lucide-react";
 
+import { CopyButton } from "@/components/shared/CopyButton";
 import { Button, Modal } from "@/components/ui";
-import { useCopySecret } from "@/lib/useCopySecret";
 
 const BACKUP_CODES_FILE_NAME = "securevault-backup-codes.txt";
 
@@ -9,8 +9,6 @@ const BackupCodesModal: React.FC<{
 	backupCodes: string[] | null;
 	onClose: () => void;
 }> = ({ backupCodes, onClose }) => {
-	const copySecret = useCopySecret();
-
 	const codesText = backupCodes?.join("\n") ?? "";
 
 	const handleDownload = () => {
@@ -48,18 +46,13 @@ const BackupCodesModal: React.FC<{
 				</div>
 
 				<div className="flex flex-wrap justify-end gap-2">
-					<Button
+					<CopyButton
+						value={codesText}
+						label="Backup codes"
 						variant="outline"
-						onClick={() =>
-							copySecret({
-								value: codesText,
-								label: "Backup codes",
-							})
-						}
-					>
-						<Copy />
-						Copy
-					</Button>
+						size="default"
+						text="Copy"
+					/>
 					<Button variant="outline" onClick={handleDownload}>
 						<Download />
 						Download
