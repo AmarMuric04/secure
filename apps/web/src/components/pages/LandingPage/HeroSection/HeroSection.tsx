@@ -33,7 +33,7 @@ const HeroSection: React.FC<{ isAuthenticated: boolean }> = ({
 				className="mt-10 grid gap-10 border-t border-foreground/15 pt-8 sm:mt-14 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-20"
 			>
 				<p className="max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground sm:text-xl">
-					SecureVault encrypts every entry in your browser with a key
+					Sealed encrypts every entry in your browser with a key
 					made from your master password, so our server only ever
 					stores ciphertext.{" "}
 					<Link

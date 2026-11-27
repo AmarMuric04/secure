@@ -61,7 +61,7 @@ const LandingHeader: React.FC<{
 				className="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight"
 			>
 				<VaultMark size="sm" />
-				SecureVault
+				Sealed
 			</Link>
 
 			<nav

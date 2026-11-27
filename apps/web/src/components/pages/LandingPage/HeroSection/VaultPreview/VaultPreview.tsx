@@ -67,7 +67,7 @@ const VaultPreview: React.FC = () => {
 			>
 				<div className="hidden border-r border-border p-4 md:block">
 					<p className="px-2 pt-1 pb-4 text-[13px] font-semibold tracking-tight">
-						SecureVault
+						Sealed
 					</p>
 					<ul className="space-y-0.5">
 						{NAV_ITEMS.map((item) => (

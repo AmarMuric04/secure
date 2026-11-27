@@ -1,8 +1,9 @@
 import { generatePassphrase, generatePassword } from "business-logic-secure";
-import { Check, Copy, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 
+import { CopyButton } from "@/components/shared/CopyButton";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +14,6 @@ const MODES = {
 	password: { label: "Password", sizes: [16, 24, 32], unit: "characters" },
 	passphrase: { label: "Passphrase", sizes: [4, 5, 6], unit: "words" },
 };
-const COPIED_MS = 1_600;
 
 const createSecret = ({
 	mode,
@@ -68,21 +68,10 @@ const GeneratorPanel: React.FC = () => {
 	const [mode, setMode] = useState<keyof typeof MODES>("password");
 	const [size, setSize] = useState(24);
 	const [secret, setSecret] = useState("");
-	const [isCopied, setIsCopied] = useState(false);
 
 	useEffect(() => {
 		setSecret(createSecret({ mode, size }));
 	}, [mode, size]);
-
-	useEffect(() => {
-		if (!isCopied) {
-			return;
-		}
-
-		const timeout = window.setTimeout(() => setIsCopied(false), COPIED_MS);
-
-		return () => window.clearTimeout(timeout);
-	}, [isCopied]);
 
 	const handleModeSelect = (nextMode: keyof typeof MODES) => {
 		setMode(nextMode);
@@ -91,11 +80,6 @@ const GeneratorPanel: React.FC = () => {
 
 	const handleRegenerate = () => {
 		setSecret(createSecret({ mode, size }));
-	};
-
-	const handleCopy = async () => {
-		await navigator.clipboard.writeText(secret);
-		setIsCopied(true);
 	};
 
 	return (
@@ -155,14 +139,13 @@ const GeneratorPanel: React.FC = () => {
 								<RefreshCw />
 								New
 							</Button>
-							<Button
+							<CopyButton
+								value={secret}
+								label={MODES[mode].label}
 								variant="outline"
 								size="sm"
-								onClick={() => void handleCopy()}
-							>
-								{isCopied ? <Check /> : <Copy />}
-								{isCopied ? "Copied" : "Copy"}
-							</Button>
+								text="Copy"
+							/>
 						</div>
 					</div>
 				</div>

@@ -64,7 +64,7 @@ const LandingClosing: React.FC<{ isAuthenticated: boolean }> = ({
 			<div className="flex flex-col gap-3 py-10 text-sm text-subtle sm:flex-row sm:items-center sm:justify-between">
 				<span className="flex items-center gap-2.5 font-medium text-foreground">
 					<VaultMark size="sm" />
-					SecureVault
+					Sealed
 				</span>
 				<span>Encrypted in your browser, stored as ciphertext.</span>
 			</div>
