@@ -7,7 +7,7 @@ const CategoriesHeader: React.FC<{
 	onSearchChange: (query: string) => void;
 }> = ({ summary, searchQuery, onSearchChange }) => {
 	const description = summary
-		? `${summary.categoryCount} ${summary.categoryCount === 1 ? "category" : "categories"} · ${summary.filedCount} password${summary.filedCount === 1 ? "" : "s"} filed`
+		? `${summary.filedCount} password${summary.filedCount === 1 ? "" : "s"} filed in ${summary.categoryCount} ${summary.categoryCount === 1 ? "category" : "categories"}`
 		: "Group your logins so they are easy to find";
 
 	return (

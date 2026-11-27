@@ -74,7 +74,7 @@ const MfaSetupForm: React.FC<{
 					Cannot scan? Enter this key instead
 				</p>
 				<div className="flex items-center gap-1 rounded-lg bg-card py-1 pr-1 pl-3 ring-1 ring-input ring-inset">
-					<code className="min-w-0 flex-1 font-mono text-[13px] tracking-wide break-all">
+					<code className="min-w-0 flex-1 font-mono text-[13px] break-all">
 						{secret}
 					</code>
 					<CopyButton value={secret} label="Secret" />

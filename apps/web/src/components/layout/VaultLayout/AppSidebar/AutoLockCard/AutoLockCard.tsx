@@ -61,7 +61,7 @@ const AutoLockCard: React.FC<{ lockAtRef: React.RefObject<number> }> = ({
 					</Button>
 				</TooltipTrigger>
 				<TooltipContent side="right">
-					Lock vault · {countdown}
+					Lock vault (auto-locks in {countdown})
 				</TooltipContent>
 			</Tooltip>
 		</>

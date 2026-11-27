@@ -21,13 +21,11 @@ const SessionRow: React.FC<{
 	const Icon = MOBILE_PATTERN.test(session.userAgent ?? "")
 		? Smartphone
 		: Monitor;
-	const details = [
-		session.ipAddress,
-		session.isCurrent
-			? "Active now"
-			: `Active ${formatRelativeTime(session.lastActiveAt)}`,
-		`signed in ${formatRelativeTime(session.createdAt)}`,
-	].filter(Boolean);
+	const activity = session.isCurrent
+		? "active now"
+		: `last active ${formatRelativeTime(session.lastActiveAt)}`;
+	const location = session.ipAddress ? ` from ${session.ipAddress}` : "";
+	const details = `Signed in ${formatRelativeTime(session.createdAt)}${location}, ${activity}`;
 
 	return (
 		<div className="flex items-center gap-3.5 py-3.5">
@@ -46,9 +44,7 @@ const SessionRow: React.FC<{
 						</span>
 					)}
 				</p>
-				<p className="truncate text-[13px] text-subtle">
-					{details.join(" · ")}
-				</p>
+				<p className="truncate text-[13px] text-subtle">{details}</p>
 			</div>
 
 			{!session.isCurrent && (

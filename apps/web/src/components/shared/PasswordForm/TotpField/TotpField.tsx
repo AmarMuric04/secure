@@ -27,13 +27,8 @@ const TotpStatus: React.FC<{ value: string }> = ({ value }) => {
 	return (
 		<p className="flex items-center gap-1.5 pb-2 text-xs text-muted-foreground">
 			<CircleCheck className="size-3.5 text-primary" />
-			{[
-				parsed.issuer,
-				`${parsed.digits} digits`,
-				`every ${parsed.period}s`,
-			]
-				.filter(Boolean)
-				.join(" · ")}
+			{parsed.issuer ? `${parsed.issuer}: ` : ""}
+			{parsed.digits}-digit codes, a new one every {parsed.period} seconds
 		</p>
 	);
 };

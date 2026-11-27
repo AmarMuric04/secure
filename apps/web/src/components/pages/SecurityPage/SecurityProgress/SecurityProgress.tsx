@@ -19,7 +19,7 @@ const SecurityProgress: React.FC<{
 		<div>
 			<PageHeader
 				title="Security"
-				description={`${healthyCount} of ${total} passwords healthy · ${remainder}`}
+				description={`${healthyCount} of ${total} passwords healthy, ${remainder}`}
 				actions={actions}
 			/>
 

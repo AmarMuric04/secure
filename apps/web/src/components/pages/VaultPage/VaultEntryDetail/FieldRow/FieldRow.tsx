@@ -37,7 +37,7 @@ const FieldRow: React.FC<{
 				<p
 					className={cn(
 						"text-[15px]",
-						isSecret && "font-mono tracking-wide",
+						isSecret && "font-mono",
 						isMultiline
 							? "leading-relaxed break-words whitespace-pre-wrap text-muted-foreground"
 							: "truncate",

@@ -37,7 +37,7 @@ const BackupCodesModal: React.FC<{
 					</p>
 				</div>
 
-				<div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg bg-border font-mono text-sm tracking-wider ring-1 ring-border">
+				<div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg bg-border font-mono text-sm ring-1 ring-border">
 					{backupCodes?.map((code) => (
 						<div key={code} className="bg-muted py-2.5 text-center">
 							{code}

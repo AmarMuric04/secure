@@ -41,7 +41,7 @@ const DataSettingsPage: React.FC = () => {
 			);
 
 			setImportSource({
-				label: `${format} export · ${file.name}`,
+				label: `${file.name} (${format} export)`,
 				isPlaintextFile: true,
 				entries: candidates,
 				invalid,
@@ -66,7 +66,7 @@ const DataSettingsPage: React.FC = () => {
 		>,
 	) => {
 		setImportSource({
-			label: `Sealed backup · ${backupFile?.name ?? ""}`,
+			label: `${backupFile?.name ?? "Backup file"} (Sealed backup)`,
 			isPlaintextFile: false,
 			entries: payload.entries,
 			invalid: [],

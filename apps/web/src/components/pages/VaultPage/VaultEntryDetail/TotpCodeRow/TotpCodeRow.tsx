@@ -64,11 +64,11 @@ const TotpCodeRow: React.FC<{ secret: string }> = ({ secret }) => {
 		<div className="group/field flex min-h-15.5 items-center gap-3 py-3 pr-2.5 pl-4 not-first:border-t">
 			<div className="min-w-0 flex-1">
 				<p className="mb-0.5 text-xs text-subtle">
-					2FA code{parsed.issuer ? ` · ${parsed.issuer}` : ""}
+					2FA code{parsed.issuer ? ` for ${parsed.issuer}` : ""}
 				</p>
 				<p
 					className={cn(
-						"font-mono text-[19px] tracking-[0.12em] tabular-nums transition-colors",
+						"font-mono text-[19px] tabular-nums transition-colors",
 						isUrgent && "text-warning",
 					)}
 				>

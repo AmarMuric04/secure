@@ -45,7 +45,9 @@ const SecurityIssueRow: React.FC<{
 	const { entry, issues, siteBreach, related } = item;
 
 	const hostname = readEntryHostname(entry.url);
-	const details = [entry.username || "No username", hostname].filter(Boolean);
+	const details = hostname
+		? `${entry.username || "No username"} on ${hostname}`
+		: entry.username || "No username";
 
 	return (
 		<motion.li
@@ -78,10 +80,9 @@ const SecurityIssueRow: React.FC<{
 						{entry.title}
 					</Link>
 					<p className="truncate text-[13px] text-subtle">
-						{details.join(" · ")}
+						{details}
 						<span className="hidden lg:inline">
-							{" "}
-							· password changed{" "}
+							, password changed{" "}
 							{formatRelativeTime(
 								entry.passwordChangedAt ?? entry.createdAt,
 							)}

@@ -45,7 +45,7 @@ const PasswordField: React.FC<{
 						onBlur={() => setIsFocused(false)}
 						onSelect={handleSelect}
 						className={cn(
-							"h-10 w-full bg-transparent font-mono text-[15px] tracking-wide outline-none placeholder:font-sans placeholder:tracking-normal placeholder:text-subtle",
+							"h-10 w-full bg-transparent font-mono text-[15px] outline-none placeholder:font-sans placeholder:text-subtle",
 							!isVisible &&
 								"text-transparent caret-transparent selection:bg-transparent selection:text-transparent",
 						)}

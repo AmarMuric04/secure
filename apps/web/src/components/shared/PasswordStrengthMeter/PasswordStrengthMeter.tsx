@@ -66,8 +66,11 @@ const PasswordStrengthMeter: React.FC<{ password: string }> = ({
 				<span className="font-mono tabular-nums">
 					{strength.entropy}
 				</span>{" "}
-				bits · cracked in {strength.crackTime}
-				{strength.feedback.length > 0 && <> · {strength.feedback[0]}</>}
+				bits, cracked{" "}
+				{strength.crackTime === "instantly"
+					? "instantly"
+					: `in ${strength.crackTime}`}
+				.{strength.feedback.length > 0 && <> {strength.feedback[0]}.</>}
 			</p>
 		</div>
 	);

@@ -32,7 +32,9 @@ const TrashTimelineItem: React.FC<{
 }) => {
 	const countdown = readPurgeCountdown(entry.deletedAt);
 	const hostname = toWebsiteLink(entry.url)?.hostname;
-	const details = [entry.username || "No username", hostname].filter(Boolean);
+	const details = hostname
+		? `${entry.username || "No username"} on ${hostname}`
+		: entry.username || "No username";
 	const purgeLabel =
 		countdown.daysLeft === 0
 			? "Removed today"
@@ -81,7 +83,7 @@ const TrashTimelineItem: React.FC<{
 						{entry.title}
 					</p>
 					<p className="truncate text-[13px] text-subtle">
-						{details.join(" · ")}
+						{details}
 					</p>
 				</div>
 
