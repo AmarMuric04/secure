@@ -1,6 +1,4 @@
-import { secure, toFaviconUrl } from "business-logic-secure";
-import { useState } from "react";
-
+import { SiteIcon } from "@/components/shared/SiteIcon";
 import { cn } from "@/lib/utils";
 
 const SIZES = {
@@ -13,16 +11,6 @@ const EntryMonogram: React.FC<{
 	url: string;
 	size?: keyof typeof SIZES;
 }> = ({ title, url, size = "md" }) => {
-	const { data: user } = secure.auth.useSession();
-
-	const faviconUrl = user?.settings.showFavicons
-		? toFaviconUrl(url.trim() || undefined)
-		: null;
-	const [failedUrl, setFailedUrl] = useState<string | null>(null);
-
-	const letter = (title.trim().charAt(0) || "?").toUpperCase();
-	const isFaviconVisible = !!faviconUrl && failedUrl !== faviconUrl;
-
 	return (
 		<span
 			className={cn(
@@ -30,23 +18,7 @@ const EntryMonogram: React.FC<{
 				SIZES[size].box,
 			)}
 		>
-			{isFaviconVisible ? (
-				<img
-					key={faviconUrl}
-					src={faviconUrl}
-					alt=""
-					referrerPolicy="no-referrer"
-					className={SIZES[size].image}
-					onError={() => setFailedUrl(faviconUrl)}
-				/>
-			) : (
-				<span
-					key={letter}
-					className="motion-safe:animate-[dial-dot-in_0.3s_var(--ease-pop)]"
-				>
-					{letter}
-				</span>
-			)}
+			<SiteIcon title={title} url={url} imageClassName={SIZES[size].image} />
 		</span>
 	);
 };

@@ -1,6 +1,6 @@
-import { type decryptVault, secure, toFaviconUrl } from "business-logic-secure";
-import { useState } from "react";
+import type { decryptVault } from "business-logic-secure";
 
+import { SiteIcon } from "@/components/shared/SiteIcon";
 import { cn } from "@/lib/utils";
 
 const SIZES = {
@@ -13,15 +13,6 @@ const VaultEntryAvatar: React.FC<{
 	size?: keyof typeof SIZES;
 	className?: string;
 }> = ({ entry, size = "md", className }) => {
-	const { data: user } = secure.auth.useSession();
-
-	const [hasFaviconFailed, setHasFaviconFailed] = useState(false);
-
-	const faviconUrl = user?.settings.showFavicons
-		? toFaviconUrl(entry.url)
-		: null;
-	const letter = (entry.title.charAt(0) || "?").toUpperCase();
-
 	return (
 		<span
 			className={cn(
@@ -30,17 +21,12 @@ const VaultEntryAvatar: React.FC<{
 				className,
 			)}
 		>
-			{faviconUrl && !hasFaviconFailed ? (
-				<img
-					src={faviconUrl}
-					alt=""
-					referrerPolicy="no-referrer"
-					className={SIZES[size].image}
-					onError={() => setHasFaviconFailed(true)}
-				/>
-			) : (
-				letter
-			)}
+			<SiteIcon
+				key={entry.id}
+				title={entry.title}
+				url={entry.url}
+				imageClassName={SIZES[size].image}
+			/>
 		</span>
 	);
 };

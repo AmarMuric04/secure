@@ -3,7 +3,7 @@ export {
 	readDeviceLabel,
 	readMasterPasswordChangeError,
 } from "./accountSecurity";
-export { toFaviconUrl } from "./faviconUrl";
+export { toFaviconUrls } from "./faviconUrl";
 export { calculatePasswordStrength, STRENGTH_LABELS } from "./passwordStrength";
 export { type decryptVault } from "./vaultEntries";
 export {
