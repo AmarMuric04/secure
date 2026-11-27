@@ -23,7 +23,11 @@ const GoogleIcon: React.FC = () => (
 
 const GoogleButton: React.FC = () => {
 	return (
-		<Button asChild variant="outline" className="h-11 w-full gap-2.5">
+		<Button
+			asChild
+			variant="outline"
+			className="h-11 w-full gap-2.5 bg-transparent ring-foreground/20 hover:bg-foreground/5"
+		>
 			<a href="/api/auth/google">
 				<GoogleIcon />
 				Continue with Google

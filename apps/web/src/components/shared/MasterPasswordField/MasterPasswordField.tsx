@@ -53,7 +53,7 @@ const MasterPasswordField: React.FC<{
 				onBlur={() => setIsFocused(false)}
 				onSelect={handleSelect}
 				className={cn(
-					"h-14.5 w-full rounded-[18px] bg-card pl-5 font-mono text-[17px] tracking-[0.08em] shadow-pop ring-1 ring-border transition-[box-shadow] duration-250 ease-out-quint outline-none placeholder:font-sans placeholder:text-[15px] placeholder:tracking-normal placeholder:text-subtle focus:ring-2 focus:ring-primary focus:placeholder:opacity-60 disabled:opacity-70",
+					"h-14.5 w-full rounded-[18px] bg-card pl-5 font-mono text-[17px] tracking-[0.08em] ring-1 ring-input transition-[box-shadow] duration-250 ease-out-quint outline-none placeholder:font-sans placeholder:text-[15px] placeholder:tracking-normal placeholder:text-subtle focus:ring-2 focus:ring-primary focus:placeholder:opacity-60 disabled:opacity-70",
 					submit ? "pr-26" : "pr-14",
 					!isRevealed &&
 						"text-transparent caret-transparent selection:bg-transparent selection:text-transparent",
@@ -96,7 +96,7 @@ const MasterPasswordField: React.FC<{
 					className={cn(
 						"absolute top-1.75 right-1.75 grid size-11 place-items-center overflow-hidden rounded-[13px] transition-[background-color,color,box-shadow,transform] duration-250 ease-out-quint active:scale-93",
 						isReady
-							? "bg-primary text-primary-foreground shadow-[0_8px_20px_-8px_var(--primary)] after:absolute after:inset-y-0 after:left-0 after:w-[45%] after:bg-linear-to-r after:from-transparent after:via-white/50 after:to-transparent after:content-[''] hover:bg-primary/90 motion-safe:after:animate-[button-shine_0.8s_var(--ease-out-quint)_both]"
+							? "bg-foreground text-background hover:bg-foreground/85"
 							: "bg-accent text-subtle",
 					)}
 				>

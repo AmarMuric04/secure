@@ -211,15 +211,6 @@
 	}
 }
 
-@keyframes button-shine {
-	from {
-		transform: translateX(-150%) skewX(-20deg);
-	}
-	to {
-		transform: translateX(350%) skewX(-20deg);
-	}
-}
-
 @keyframes hint-in {
 	from {
 		opacity: 0;

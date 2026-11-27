@@ -94,6 +94,7 @@ const LoginPage: React.FC = () => {
 						/>
 						<Button
 							type="submit"
+							variant="ink"
 							size="lg"
 							className="mt-2 h-11 w-full"
 							isLoading={login.isPending}
@@ -106,7 +107,7 @@ const LoginPage: React.FC = () => {
 						New to Sealed?{" "}
 						<Link
 							to="/register"
-							className="font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground"
+							className="font-medium text-foreground underline decoration-foreground/30 underline-offset-4 transition-colors hover:decoration-foreground"
 						>
 							Create an account
 						</Link>

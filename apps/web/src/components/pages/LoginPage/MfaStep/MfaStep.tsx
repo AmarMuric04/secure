@@ -1,6 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
 import { secure } from "business-logic-secure";
-import { ShieldCheck } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
@@ -40,7 +39,6 @@ const MfaStep: React.FC<{ mfaToken?: string }> = ({ mfaToken }) => {
 					? "Enter the 6-digit code from your authenticator app."
 					: "Enter one of the backup codes you saved."
 			}
-			icon={<ShieldCheck />}
 		>
 			<FormError message={verifyMfa.error?.message} />
 
@@ -78,6 +76,7 @@ const MfaStep: React.FC<{ mfaToken?: string }> = ({ mfaToken }) => {
 
 				<Button
 					type="submit"
+					variant="ink"
 					size="lg"
 					className="mt-2 h-11 w-full"
 					disabled={!isComplete}
@@ -89,7 +88,7 @@ const MfaStep: React.FC<{ mfaToken?: string }> = ({ mfaToken }) => {
 
 			<button
 				type="button"
-				className="self-start rounded-md text-sm text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground"
+				className="self-start rounded-md text-sm text-muted-foreground underline decoration-foreground/30 underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground"
 				onClick={handleMethodToggle}
 			>
 				{method === "totp"

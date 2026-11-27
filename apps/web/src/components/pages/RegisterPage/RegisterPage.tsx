@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { secure } from "business-logic-secure";
-import { KeyRound } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
 
@@ -57,7 +56,7 @@ const RegisterPage: React.FC = () => {
 				<AuthStep
 					key="details"
 					title="Create your vault"
-					description="A private place for every password you own."
+					description="Every entry is encrypted in this browser before it reaches our server."
 				>
 					<GoogleButton />
 
@@ -102,26 +101,23 @@ const RegisterPage: React.FC = () => {
 								setConfirmation(event.target.value)
 							}
 						/>
-						<p className="flex gap-2.5 text-[13px] leading-relaxed text-muted-foreground">
-							<KeyRound className="mt-0.5 size-3.5 shrink-0 text-subtle" />
-							Your master password encrypts your vault on this
-							device. We never see it, so it cannot be reset.
-						</p>
-						<label className="flex cursor-pointer items-start gap-2.5 text-sm">
+						<label className="mt-1 flex cursor-pointer items-start gap-3 border-t border-foreground/15 pt-5 text-sm">
 							<Checkbox
 								checked={hasAgreed}
-								className="mt-0.5"
+								className="mt-0.5 data-[state=checked]:border-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background"
 								onCheckedChange={(checked) =>
 									setHasAgreed(checked === true)
 								}
 							/>
-							<span className="text-muted-foreground">
-								I agree to the Terms of Service and Privacy
-								Policy
+							<span className="leading-relaxed text-muted-foreground">
+								I understand my master password encrypts my
+								vault on this device, and that Sealed can’t
+								reset it if I forget it.
 							</span>
 						</label>
 						<Button
 							type="submit"
+							variant="ink"
 							size="lg"
 							className="mt-2 h-11 w-full"
 							disabled={!hasAgreed}
@@ -135,7 +131,7 @@ const RegisterPage: React.FC = () => {
 						Already have an account?{" "}
 						<Link
 							to="/login"
-							className="font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground"
+							className="font-medium text-foreground underline decoration-foreground/30 underline-offset-4 transition-colors hover:decoration-foreground"
 						>
 							Sign in
 						</Link>

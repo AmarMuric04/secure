@@ -1,4 +1,3 @@
-import { Lock } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 
@@ -32,9 +31,9 @@ const VaultSplash: React.FC<{ message: string }> = ({ message }) => {
 		<div
 			role="status"
 			aria-live="polite"
-			className="fixed inset-0 z-50 grid place-items-center bg-background px-4 py-20"
+			className="fixed inset-0 z-50 grid place-items-center bg-background px-5 py-24"
 		>
-			<div className="absolute top-5 left-4 flex items-center gap-2.5 font-semibold tracking-tight sm:left-6">
+			<div className="absolute top-5 left-5 flex items-center gap-2.5 text-[15px] font-semibold tracking-tight sm:left-8">
 				<VaultMark size="sm" />
 				Sealed
 			</div>
@@ -44,21 +43,21 @@ const VaultSplash: React.FC<{ message: string }> = ({ message }) => {
 					<CombinationDial length={length} status="idle" />
 				</div>
 
-				<h1 className="text-3xl font-semibold tracking-tight">
+				<h1 className="text-[2.5rem] leading-[1.05] font-medium tracking-[-0.045em] text-balance sm:text-5xl">
 					Opening your vault
 				</h1>
-				<p className="mt-2 text-muted-foreground">{message}</p>
+				<p className="mt-4 text-pretty text-muted-foreground">
+					{message}
+				</p>
 
-				<span className="mt-5 h-7.5 w-56 animate-pulse rounded-full bg-muted ring-1 ring-border" />
-				<span className="mt-7 h-14.5 w-full animate-pulse rounded-[18px] bg-card ring-1 ring-border" />
+				<span className="mt-6 h-11.5 w-full border-y border-foreground/15" />
+				<span className="mt-7 h-14.5 w-full animate-pulse rounded-[18px] bg-card ring-1 ring-input" />
 				<span className="mt-3 h-5 min-h-5" />
 				<span className="mt-3 h-5" />
 			</div>
 
-			<p className="pointer-events-none absolute inset-x-0 bottom-5 flex items-center justify-center gap-2 px-4 text-center text-xs text-subtle">
-				<Lock className="size-3.5 shrink-0" />
-				End-to-end encrypted. Your master password never leaves this
-				device.
+			<p className="pointer-events-none absolute inset-x-0 bottom-6 px-5 text-center text-sm text-subtle">
+				Your master password never leaves this device.
 			</p>
 		</div>
 	);

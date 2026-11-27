@@ -1,11 +1,12 @@
-import { Link, Navigate, Outlet } from "@tanstack/react-router";
+import { Navigate, Outlet } from "@tanstack/react-router";
 import { secure } from "business-logic-secure";
-import { Lock } from "lucide-react";
+import { MotionConfig } from "motion/react";
 
 import { VaultMark } from "@/components/shared/VaultMark";
 import { Spinner } from "@/components/ui";
 
-import { AuthShowcase } from "./AuthShowcase";
+import { AuthHeader } from "./AuthHeader";
+import { AuthNotes } from "./AuthNotes";
 
 const AuthLayout: React.FC = () => {
 	const { data: user, isPending } = secure.auth.useSession();
@@ -15,20 +16,12 @@ const AuthLayout: React.FC = () => {
 	}
 
 	return (
-		<div className="grid min-h-svh bg-background lg:h-svh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
-			<div className="flex min-h-svh flex-col px-6 sm:px-12 lg:min-h-0 lg:overflow-y-auto">
-				<header className="flex h-20 shrink-0 items-center">
-					<Link
-						to="/"
-						className="flex items-center gap-2.5 rounded-lg font-semibold tracking-tight"
-					>
-						<VaultMark size="sm" />
-						Sealed
-					</Link>
-				</header>
+		<MotionConfig reducedMotion="user">
+			<div className="flex min-h-svh flex-col overflow-x-clip bg-background">
+				<AuthHeader />
 
-				<main className="flex flex-1 items-center justify-center py-10">
-					<div className="w-full max-w-[380px]">
+				<main className="mx-auto grid w-full max-w-6xl flex-1 content-start gap-16 px-5 pt-10 pb-20 sm:px-8 sm:pt-16 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:pt-20 xl:gap-20">
+					<div className="w-full max-w-sm">
 						{isPending ? (
 							<div className="flex justify-center py-16">
 								<Spinner />
@@ -37,16 +30,23 @@ const AuthLayout: React.FC = () => {
 							<Outlet />
 						)}
 					</div>
+
+					<AuthNotes />
 				</main>
 
-				<footer className="flex h-16 shrink-0 items-center gap-1.5 text-xs text-subtle">
-					<Lock className="size-3" />
-					Your master password never leaves this device.
+				<footer className="mx-auto w-full max-w-6xl px-5 sm:px-8">
+					<div className="flex flex-col gap-3 border-t border-foreground/15 py-8 text-sm text-subtle sm:flex-row sm:items-center sm:justify-between">
+						<span className="flex items-center gap-2.5 font-medium text-foreground">
+							<VaultMark size="sm" />
+							Sealed
+						</span>
+						<span>
+							Encrypted in your browser, stored as ciphertext.
+						</span>
+					</div>
 				</footer>
 			</div>
-
-			<AuthShowcase />
-		</div>
+		</MotionConfig>
 	);
 };
 

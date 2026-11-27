@@ -86,7 +86,7 @@ const EncryptionDemo: React.FC = () => {
 	}, [tick, sampleIndex, isReducedMotion]);
 
 	return (
-		<div className="w-[380px] rounded-2xl bg-card p-5 shadow-pop">
+		<div className="w-full">
 			<AnimatePresence mode="wait" initial={false}>
 				<motion.div
 					key={sample?.site}
@@ -105,10 +105,8 @@ const EncryptionDemo: React.FC = () => {
 					</div>
 					<span
 						className={cn(
-							"grid size-8 place-items-center rounded-full transition-colors duration-300",
-							isSealed
-								? "bg-primary-soft text-primary"
-								: "text-subtle",
+							"grid size-8 place-items-center transition-colors duration-300",
+							isSealed ? "text-foreground" : "text-subtle",
 						)}
 					>
 						{isSealed ? (
@@ -120,7 +118,7 @@ const EncryptionDemo: React.FC = () => {
 				</motion.div>
 			</AnimatePresence>
 
-			<div className="mt-5 border-t border-border pt-4">
+			<div className="mt-5">
 				<p className="text-xs text-subtle">Password</p>
 				<p className="mt-1.5 truncate font-mono text-[15px] tracking-tight">
 					{Array.from(display, (character, index) => (
@@ -138,9 +136,9 @@ const EncryptionDemo: React.FC = () => {
 					))}
 				</p>
 
-				<div className="mt-4 h-0.5 overflow-hidden rounded-full bg-accent">
+				<div className="mt-4 h-px overflow-hidden bg-foreground/15">
 					<div
-						className="h-full rounded-full bg-primary transition-[width] duration-100 ease-linear"
+						className="h-full bg-foreground transition-[width] duration-100 ease-linear"
 						style={{ width: `${progress * 100}%` }}
 					/>
 				</div>

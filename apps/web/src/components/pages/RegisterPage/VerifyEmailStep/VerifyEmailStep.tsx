@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { secure } from "business-logic-secure";
-import { ArrowLeft, Mail } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
 import { AuthStep } from "@/components/shared/AuthStep";
@@ -37,7 +37,6 @@ const VerifyEmailStep: React.FC<{
 					</span>
 				</>
 			}
-			icon={<Mail />}
 		>
 			<FormError message={confirmRegistration.error?.message} />
 
@@ -51,6 +50,7 @@ const VerifyEmailStep: React.FC<{
 
 				<Button
 					type="submit"
+					variant="ink"
 					size="lg"
 					className="mt-2 h-11 w-full"
 					disabled={code.length !== 6}
