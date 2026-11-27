@@ -46,7 +46,7 @@ const FeatureList: React.FC = () => {
 					<motion.div
 						key={feature.title}
 						{...revealProps({ delay: (index % 2) * 0.06 })}
-						className="grid gap-2 border-t border-foreground/15 py-6 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-6"
+						className="grid gap-2 border-t border-foreground/15 py-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-6"
 					>
 						<dt className="font-medium tracking-tight">
 							{feature.title}

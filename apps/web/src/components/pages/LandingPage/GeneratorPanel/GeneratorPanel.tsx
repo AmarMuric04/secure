@@ -7,6 +7,7 @@ import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 import { revealProps } from "../landingMotion";
+import { SectionHeading } from "../SectionHeading";
 
 const MODES = {
 	password: { label: "Password", sizes: [16, 24, 32], unit: "characters" },
@@ -98,24 +99,19 @@ const GeneratorPanel: React.FC = () => {
 	};
 
 	return (
-		<section className="mx-auto grid max-w-6xl gap-12 px-5 pt-28 sm:px-8 lg:grid-cols-[22rem_minmax(0,1fr)] lg:gap-16 lg:pt-40">
-			<motion.div {...revealProps({})}>
-				<p className="text-sm font-medium text-primary">Generator</p>
-				<h2 className="mt-4 text-[2rem] leading-[1.1] font-medium tracking-[-0.035em] text-balance sm:text-5xl">
-					Need a better one? Make it here.
-				</h2>
-				<p className="mt-5 text-lg leading-relaxed text-pretty text-muted-foreground">
-					The same generator the vault uses, running on your device.
-					Nothing on this page is saved or sent.
-				</p>
-			</motion.div>
+		<section className="mx-auto max-w-6xl px-5 pt-28 sm:px-8 lg:pt-40">
+			<SectionHeading
+				eyebrow="Generator"
+				title="Need a better one? Make it here."
+				lede="The same generator the vault uses, running on your device. Nothing on this page is saved or sent."
+			/>
 
 			<motion.div
 				{...revealProps({ delay: 0.08 })}
-				className="self-end rounded-[1.75rem] bg-accent/70 p-2 sm:p-3"
+				className="mt-14 rounded-[1.75rem] bg-accent/70 p-2 sm:mt-16 sm:p-3"
 			>
-				<div className="rounded-[1.25rem] bg-card p-5 shadow-panel sm:p-7">
-					<p className="min-h-16 font-mono text-xl leading-8 tracking-tight break-all sm:text-2xl sm:leading-9">
+				<div className="rounded-[1.25rem] bg-card p-5 shadow-panel sm:p-8">
+					<p className="min-h-16 font-mono text-xl leading-8 tracking-tight break-all sm:text-3xl sm:leading-10">
 						{secret}
 					</p>
 
