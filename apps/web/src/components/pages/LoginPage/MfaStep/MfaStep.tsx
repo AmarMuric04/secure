@@ -62,7 +62,7 @@ const MfaStep: React.FC<{ mfaToken?: string }> = ({ mfaToken }) => {
 								autoComplete="one-time-code"
 								aria-label="Backup code"
 								placeholder="Backup code"
-								className="h-12 text-center font-mono tracking-[0.2em]"
+								className="h-12 text-center font-mono"
 								value={code}
 								onChange={(event) =>
 									setCode(

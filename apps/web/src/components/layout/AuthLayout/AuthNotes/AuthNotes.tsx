@@ -7,7 +7,7 @@ import { EncryptionDemo } from "./EncryptionDemo";
 
 const NOTES = {
 	signIn: {
-		eyebrow: "When you sign in",
+		key: "sign-in",
 		title: "Your master password never leaves this device.",
 		steps: [
 			{
@@ -16,7 +16,7 @@ const NOTES = {
 			},
 			{
 				title: "Only a hash is sent",
-				detail: "One key signs a hash that our server checks against a bcrypt hash. The password itself is never sent.",
+				detail: "One key produces an auth hash, which our server checks against the bcrypt hash it stores. The password itself is never sent.",
 			},
 			{
 				title: "Your vault opens here",
@@ -25,7 +25,7 @@ const NOTES = {
 		],
 	},
 	register: {
-		eyebrow: "When you create a vault",
+		key: "register",
 		title: "We can’t reset your master password, so choose one you’ll remember.",
 		steps: [
 			{
@@ -53,34 +53,28 @@ const AuthNotes: React.FC = () => {
 
 	return (
 		<motion.aside
-			key={notes.eyebrow}
+			key={notes.key}
 			initial={{ opacity: 0, y: 12 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.1 }}
 			className="border-t border-foreground/15 pt-10 lg:border-t-0 lg:border-l lg:pt-2 lg:pl-16 xl:pl-20"
 		>
-			<p className="text-sm font-medium text-primary">{notes.eyebrow}</p>
-			<h2 className="mt-4 max-w-xl text-[1.75rem] leading-[1.1] font-medium tracking-[-0.035em] text-balance sm:text-4xl">
+			<h2 className="max-w-xl text-[1.75rem] leading-[1.1] font-medium tracking-[-0.035em] text-balance sm:text-4xl">
 				{notes.title}
 			</h2>
 
 			<ol className="mt-10">
-				{notes.steps.map((step, index) => (
+				{notes.steps.map((step) => (
 					<li
 						key={step.title}
-						className="grid gap-x-6 gap-y-1.5 border-t border-foreground/15 py-5 sm:grid-cols-[2.5rem_minmax(0,1fr)]"
+						className="border-t border-foreground/15 py-5"
 					>
-						<p className="font-mono text-xs text-subtle sm:pt-1">
-							0{index + 1}
+						<h3 className="font-medium tracking-tight">
+							{step.title}
+						</h3>
+						<p className="mt-1 text-[15px] leading-relaxed text-pretty text-muted-foreground">
+							{step.detail}
 						</p>
-						<div>
-							<h3 className="font-medium tracking-tight">
-								{step.title}
-							</h3>
-							<p className="mt-1 text-[15px] leading-relaxed text-pretty text-muted-foreground">
-								{step.detail}
-							</p>
-						</div>
 					</li>
 				))}
 			</ol>
