@@ -10,16 +10,16 @@ const NAV_ITEMS = [
 	{ label: "Trash", count: "", isActive: false },
 ];
 const SAMPLE_ENTRIES = [
-	{ title: "GitHub", detail: "octo-dev · github.com", strength: 4 },
-	{ title: "Figma", detail: "studio · figma.com", strength: 3 },
+	{ title: "GitHub", detail: "octo-dev", strength: 4 },
+	{ title: "Figma", detail: "studio@example.com", strength: 3 },
 	{
 		title: "Northbank",
-		detail: "j.doe · northbank.example",
+		detail: "j.doe",
 		strength: 1,
-		flag: "Weak · reused",
+		flag: "Weak and reused",
 	},
-	{ title: "Home router", detail: "admin · 192.168.0.1", strength: 3 },
-	{ title: "Netflix", detail: "family · netflix.com", strength: 2 },
+	{ title: "Home router", detail: "admin", strength: 3 },
+	{ title: "Netflix", detail: "family@example.com", strength: 2 },
 ];
 const STRENGTH_LEVELS = [0, 1, 2, 3, 4];
 
@@ -55,7 +55,7 @@ const StrengthBars: React.FC<{ strength: number }> = ({ strength }) => {
 
 const VaultPreview: React.FC = () => {
 	return (
-		<figure className="rounded-[1.75rem] bg-accent/70 p-2 sm:p-3 lg:p-4">
+		<figure>
 			<figcaption className="sr-only">
 				A sample vault: five saved logins, one flagged as weak and
 				reused.
@@ -63,7 +63,7 @@ const VaultPreview: React.FC = () => {
 
 			<div
 				aria-hidden="true"
-				className="grid overflow-hidden rounded-[1.25rem] bg-card text-left shadow-panel md:grid-cols-[13rem_minmax(0,1fr)]"
+				className="grid overflow-hidden rounded-xl bg-card text-left ring-1 ring-border md:grid-cols-[13rem_minmax(0,1fr)]"
 			>
 				<div className="hidden border-r border-border p-4 md:block">
 					<p className="px-2 pt-1 pb-4 text-[13px] font-semibold tracking-tight">

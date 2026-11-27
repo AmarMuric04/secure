@@ -1,10 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { motion } from "motion/react";
 
 import { VaultMark } from "@/components/shared/VaultMark";
 import { Button } from "@/components/ui";
-
-import { revealProps } from "../landingMotion";
 
 const ClosingNote: React.FC<{ isAuthenticated: boolean }> = ({
 	isAuthenticated,
@@ -33,10 +30,7 @@ const LandingClosing: React.FC<{ isAuthenticated: boolean }> = ({
 }) => {
 	return (
 		<footer className="mx-auto max-w-6xl px-5 pt-28 sm:px-8 lg:pt-40">
-			<motion.div
-				{...revealProps({})}
-				className="flex flex-col gap-8 rounded-[1.75rem] bg-band px-7 py-12 text-band-foreground sm:px-12 sm:py-16 lg:flex-row lg:items-end lg:justify-between"
-			>
+			<div className="flex flex-col gap-8 rounded-[1.75rem] bg-band px-7 py-12 text-band-foreground sm:px-12 sm:py-16 lg:flex-row lg:items-end lg:justify-between">
 				<div className="max-w-xl">
 					<p className="text-[2rem] leading-[1.1] font-medium tracking-[-0.035em] text-balance sm:text-5xl">
 						{isAuthenticated
@@ -59,7 +53,7 @@ const LandingClosing: React.FC<{ isAuthenticated: boolean }> = ({
 							: "Create your vault"}
 					</Link>
 				</Button>
-			</motion.div>
+			</div>
 
 			<div className="flex flex-col gap-3 py-10 text-sm text-subtle sm:flex-row sm:items-center sm:justify-between">
 				<span className="flex items-center gap-2.5 font-medium text-foreground">

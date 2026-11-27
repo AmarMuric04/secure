@@ -1,6 +1,3 @@
-import { motion } from "motion/react";
-
-import { revealProps } from "../landingMotion";
 import { SectionHeading } from "../SectionHeading";
 
 const FEATURES = [
@@ -36,16 +33,12 @@ const FeatureList: React.FC = () => {
 			id="features"
 			className="mx-auto max-w-6xl scroll-mt-6 px-5 pt-28 sm:px-8 lg:pt-40"
 		>
-			<SectionHeading
-				eyebrow="Features"
-				title="The everyday parts, done carefully."
-			/>
+			<SectionHeading title="The everyday parts, done carefully." />
 
 			<dl className="mt-14 grid gap-x-16 sm:mt-16 md:grid-cols-2">
-				{FEATURES.map((feature, index) => (
-					<motion.div
+				{FEATURES.map((feature) => (
+					<div
 						key={feature.title}
-						{...revealProps({ delay: (index % 2) * 0.06 })}
 						className="grid gap-2 border-t border-foreground/15 py-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-6"
 					>
 						<dt className="font-medium tracking-tight">
@@ -54,7 +47,7 @@ const FeatureList: React.FC = () => {
 						<dd className="text-[15px] leading-relaxed text-pretty text-muted-foreground">
 							{feature.detail}
 						</dd>
-					</motion.div>
+					</div>
 				))}
 			</dl>
 		</section>
