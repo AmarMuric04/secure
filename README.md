@@ -1,4 +1,4 @@
-# SecureVault
+# Sealed
 
 A zero-knowledge password manager. The browser derives keys from your master
 password and encrypts every entry before it leaves the device; the server only
@@ -6,7 +6,7 @@ ever stores ciphertext.
 
 **Live:** https://keep-your-passwords-safe.vercel.app
 
-![SecureVault landing page](docs/screenshot.png)
+![Sealed landing page](docs/screenshot.png)
 
 ## Features
 
