@@ -67,7 +67,10 @@ const CopyButton: React.FC<{
 			size={size}
 			aria-label={text ? undefined : `Copy ${label}`}
 			disabled={disabled || !value}
-			className={cn(isCopied && "text-primary hover:text-primary", className)}
+			className={cn(
+				isCopied && "text-primary hover:text-primary",
+				className,
+			)}
 			onClick={() => void handleClick()}
 		>
 			<span className="relative grid size-4 place-items-center">
@@ -77,7 +80,11 @@ const CopyButton: React.FC<{
 						initial={
 							isReducedMotion
 								? { opacity: 0 }
-								: { opacity: 0, scale: 0.4, rotate: isCopied ? -45 : 45 }
+								: {
+										opacity: 0,
+										scale: 0.4,
+										rotate: isCopied ? -45 : 45,
+									}
 						}
 						animate={{ opacity: 1, scale: 1, rotate: 0 }}
 						exit={

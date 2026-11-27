@@ -130,7 +130,9 @@ const CategoryField: React.FC<{
 					<div className="flex h-8 items-center gap-2 rounded-lg bg-accent px-2">
 						<span
 							className="size-2 shrink-0 rounded-full"
-							style={{ backgroundColor: NEW_CATEGORY_STYLE.color }}
+							style={{
+								backgroundColor: NEW_CATEGORY_STYLE.color,
+							}}
 						/>
 						<input
 							autoFocus

@@ -18,7 +18,11 @@ const EntryMonogram: React.FC<{
 				SIZES[size].box,
 			)}
 		>
-			<SiteIcon title={title} url={url} imageClassName={SIZES[size].image} />
+			<SiteIcon
+				title={title}
+				url={url}
+				imageClassName={SIZES[size].image}
+			/>
 		</span>
 	);
 };
