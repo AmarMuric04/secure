@@ -1,118 +1,155 @@
-import { Cloud, KeyRound, Laptop } from "lucide-react";
+import { Lock, LockOpen } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
+import { siApple, siGithub, siSpotify } from "simple-icons";
 
 import { EASE_OUT } from "@/lib/motion";
+import { cn } from "@/lib/utils";
+
+import { SampleIcon } from "./SampleIcon";
 
 const SAMPLES = [
-	{ site: "github.com", secret: "correct-horse-battery" },
-	{ site: "bank.example", secret: "Tr0pical!Mango#42" },
-	{ site: "mail.example", secret: "violet sunrise ledger" },
+	{
+		site: "GitHub",
+		username: "octo-dev",
+		secret: "correct-horse-battery",
+		icon: siGithub,
+	},
+	{
+		site: "Apple Account",
+		username: "j.doe@icloud.com",
+		secret: "Tr0pical!Mango#42",
+		icon: siApple,
+	},
+	{
+		site: "Spotify",
+		username: "violet.sunrise",
+		secret: "ledger-orbit-velvet-9",
+		icon: siSpotify,
+	},
 ];
 const CIPHER_GLYPHS =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-const CIPHER_LENGTH = 28;
-const CYCLE_MILLISECONDS = 4_200;
-const TICK_MILLISECONDS = 45;
-const SETTLED_TICK = CIPHER_LENGTH * 2 + 8;
+const TICK_MILLISECONDS = 50;
+const READABLE_TICKS = 34;
+const SEALING_TICKS = 22;
+const SEALED_TICKS = 40;
+const CYCLE_TICKS = READABLE_TICKS + SEALING_TICKS + SEALED_TICKS;
 
 const randomGlyph = () =>
 	CIPHER_GLYPHS.charAt(Math.floor(Math.random() * CIPHER_GLYPHS.length));
 
-const randomCipher = () =>
-	Array.from({ length: CIPHER_LENGTH }, randomGlyph).join("");
+const toCipher = (length: number) =>
+	Array.from({ length }, randomGlyph).join("");
 
 const EncryptionDemo: React.FC = () => {
 	const isReducedMotion = useReducedMotion();
+
 	const [sampleIndex, setSampleIndex] = useState(0);
-	const [target, setTarget] = useState(randomCipher);
-	const [tick, setTick] = useState(SETTLED_TICK);
+	const [tick, setTick] = useState(0);
+	const [cipher, setCipher] = useState(() =>
+		toCipher(SAMPLES[0]?.secret.length ?? 0),
+	);
 
 	const sample = SAMPLES[sampleIndex] ?? SAMPLES[0];
+	const secret = sample?.secret ?? "";
+	const progress = Math.min(
+		1,
+		Math.max(0, (tick - READABLE_TICKS) / SEALING_TICKS),
+	);
+	const sealedCount = Math.floor(progress * secret.length);
+	const isSealed = progress >= 1;
+	const display = Array.from(secret, (character, index) =>
+		index < sealedCount ? (cipher[index] ?? character) : character,
+	).join("");
 
 	useEffect(() => {
 		if (isReducedMotion) {
 			return;
 		}
 
-		const cycle = window.setInterval(() => {
-			setSampleIndex((index) => (index + 1) % SAMPLES.length);
-			setTarget(randomCipher());
+		const timeout = window.setTimeout(() => {
+			if (tick + 1 < CYCLE_TICKS) {
+				setTick(tick + 1);
+
+				return;
+			}
+
+			const nextIndex = (sampleIndex + 1) % SAMPLES.length;
+
+			setSampleIndex(nextIndex);
+			setCipher(toCipher(SAMPLES[nextIndex]?.secret.length ?? 0));
 			setTick(0);
-		}, CYCLE_MILLISECONDS);
-
-		return () => window.clearInterval(cycle);
-	}, [isReducedMotion]);
-
-	useEffect(() => {
-		if (tick >= SETTLED_TICK) {
-			return;
-		}
-
-		const timeout = window.setTimeout(
-			() => setTick(tick + 1),
-			TICK_MILLISECONDS,
-		);
+		}, TICK_MILLISECONDS);
 
 		return () => window.clearTimeout(timeout);
-	}, [tick]);
-
-	const cipher = Array.from(target, (character, index) => {
-		if (tick >= index * 2 + 8) {
-			return character;
-		}
-
-		return tick >= index ? randomGlyph() : "·";
-	}).join("");
+	}, [tick, sampleIndex, isReducedMotion]);
 
 	return (
-		<div className="w-[360px] rounded-2xl bg-card/85 p-5 shadow-pop backdrop-blur-md">
-			<div className="flex items-center gap-2 text-xs text-subtle">
-				<Laptop className="size-3.5" />
-				On your device
-			</div>
-			<div className="mt-2.5 flex h-11 items-center justify-between gap-3 rounded-lg bg-muted px-3.5 ring-1 ring-border ring-inset">
-				<AnimatePresence mode="popLayout" initial={false}>
-					<motion.span
-						key={sample?.secret}
-						initial={{ opacity: 0, y: 8 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -8 }}
-						transition={{ duration: 0.35, ease: EASE_OUT }}
-						className="truncate font-mono text-sm text-foreground"
+		<div className="w-[380px] rounded-2xl bg-card p-5 shadow-pop">
+			<AnimatePresence mode="wait" initial={false}>
+				<motion.div
+					key={sample?.site}
+					initial={{ opacity: 0, y: 6 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={{ opacity: 0, y: -6 }}
+					transition={{ duration: 0.3, ease: EASE_OUT }}
+					className="flex items-center gap-3"
+				>
+					<SampleIcon icon={sample?.icon ?? siGithub} />
+					<div className="min-w-0 flex-1">
+						<p className="text-sm font-medium">{sample?.site}</p>
+						<p className="truncate text-[13px] text-subtle">
+							{sample?.username}
+						</p>
+					</div>
+					<span
+						className={cn(
+							"grid size-8 place-items-center rounded-full transition-colors duration-300",
+							isSealed
+								? "bg-primary-soft text-primary"
+								: "text-subtle",
+						)}
 					>
-						{sample?.secret}
-					</motion.span>
-				</AnimatePresence>
-				<span className="shrink-0 text-xs text-subtle">
-					{sample?.site}
-				</span>
-			</div>
+						{isSealed ? (
+							<Lock className="size-4" />
+						) : (
+							<LockOpen className="size-4" />
+						)}
+					</span>
+				</motion.div>
+			</AnimatePresence>
 
-			<div className="relative my-1 flex h-14 items-center pl-5">
-				<span className="absolute inset-y-0 left-5 w-px bg-border" />
-				<motion.span
-					key={sampleIndex}
-					aria-hidden="true"
-					initial={{ top: "0%", opacity: 0 }}
-					animate={{ top: "100%", opacity: [0, 1, 1, 0] }}
-					transition={{ duration: 0.9, ease: EASE_OUT }}
-					className="absolute left-5 size-1.5 -translate-x-[2.5px] rounded-full bg-primary"
-				/>
-				<span className="ml-4 inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-[11px] font-medium text-primary">
-					<KeyRound className="size-3" />
-					AES-256-GCM · key never leaves
-				</span>
-			</div>
+			<div className="mt-5 border-t border-border pt-4">
+				<p className="text-xs text-subtle">Password</p>
+				<p className="mt-1.5 truncate font-mono text-[15px] tracking-tight">
+					{Array.from(display, (character, index) => (
+						<span
+							key={index}
+							className={cn(
+								"transition-colors duration-300",
+								index < sealedCount
+									? "text-muted-foreground"
+									: "text-foreground",
+							)}
+						>
+							{character}
+						</span>
+					))}
+				</p>
 
-			<div className="flex items-center gap-2 text-xs text-subtle">
-				<Cloud className="size-3.5" />
-				What reaches our servers
-			</div>
-			<div className="mt-2.5 flex h-11 items-center rounded-lg px-3.5 ring-1 ring-border ring-inset">
-				<span className="truncate font-mono text-sm tracking-tight text-muted-foreground">
-					{cipher}
-				</span>
+				<div className="mt-4 h-0.5 overflow-hidden rounded-full bg-accent">
+					<div
+						className="h-full rounded-full bg-primary transition-[width] duration-100 ease-linear"
+						style={{ width: `${progress * 100}%` }}
+					/>
+				</div>
+
+				<p className="mt-2.5 text-xs text-subtle">
+					{isSealed
+						? "AES-256-GCM. This is all our servers store."
+						: "Readable only here, on your device."}
+				</p>
 			</div>
 		</div>
 	);
