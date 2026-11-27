@@ -52,7 +52,7 @@ const VaultListPanel: React.FC<{
 		(category) => category.id === categoryId,
 	)?.name;
 	const title = isFavoritesOnly ? "Favorites" : (categoryName ?? "All items");
-	const undecryptableCount = vault.data?.undecryptableCount ?? 0;
+	const undecryptable = vault.data?.undecryptable ?? [];
 	const listKey = [categoryId, isFavoritesOnly, sort.field, sort.order].join(
 		"|",
 	);
@@ -141,8 +141,8 @@ const VaultListPanel: React.FC<{
 				</div>
 			</div>
 
-			{undecryptableCount > 0 && (
-				<UndecryptableNotice count={undecryptableCount} />
+			{undecryptable.length > 0 && (
+				<UndecryptableNotice entries={undecryptable} />
 			)}
 
 			<VaultListBody

@@ -52,6 +52,9 @@ const decryptVault = async (vault: Awaited<ReturnType<typeof getVault>>) => {
 	const passwords = results.flatMap((result) =>
 		result.status === "fulfilled" ? [result.value] : [],
 	);
+	const undecryptable = vault.passwords.filter(
+		(_, index) => results[index]?.status === "rejected",
+	);
 
 	if (vault.passwords.length > 0 && passwords.length === 0) {
 		throw new Error(
@@ -71,7 +74,8 @@ const decryptVault = async (vault: Awaited<ReturnType<typeof getVault>>) => {
 
 	return {
 		categories: vault.categories,
-		undecryptableCount: vault.passwords.length - passwords.length,
+		undecryptable,
+		undecryptableCount: undecryptable.length,
 		passwords: passwords.map((entry) => ({
 			...entry,
 			isReused:
@@ -115,4 +119,4 @@ const sealEntry = async (entry: {
 	};
 };
 
-export { decryptVault, sealEntry };
+export { decryptVault, sealEntry, secretFieldsSchema };

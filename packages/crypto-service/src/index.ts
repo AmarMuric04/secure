@@ -1,6 +1,7 @@
 export { createSalt } from "./createSalt";
 export { createVaultKey } from "./createVaultKey";
 export { decryptEntry } from "./decryptEntry";
+export { deriveLegacyEntryKey } from "./deriveLegacyEntryKey";
 export { deriveMasterKeys } from "./deriveMasterKeys";
 export { encryptEntry } from "./encryptEntry";
 export { generatePassphrase } from "./generatePassphrase";

@@ -9,6 +9,7 @@ import {
 	updatePasswordEntry,
 } from "secure-service";
 
+import { readRecoverySalts, recoverEntries } from "../../service/entryRecovery";
 import { type decryptVault, sealEntry } from "../../service/vaultEntries";
 import {
 	createMasterPassword,
@@ -107,6 +108,50 @@ const useUpdatePassword = () => {
 	);
 };
 
+const useRecoverEntries = () => {
+	const queryClient = useQueryClient();
+
+	return useInvalidatingMutation(
+		async ({
+			password,
+			email,
+			entries,
+		}: {
+			password: string;
+			email: string;
+			entries: Awaited<ReturnType<typeof decryptVault>>["undecryptable"];
+		}) => {
+			const keys = await queryClient.fetchQuery(vaultKeysQueryOptions());
+			const recovered = await recoverEntries({
+				password,
+				salts: readRecoverySalts({ email, accountSalt: keys.salt }),
+				entries,
+			});
+
+			await Promise.all(
+				recovered.map(async ({ entry, secrets }) =>
+					updatePasswordEntry({
+						id: entry.id,
+						...(await sealEntry({
+							...secrets,
+							categoryId: entry.categoryId,
+							tags: entry.tags,
+							favorite: entry.favorite,
+							isCompromised: entry.isCompromised,
+						})),
+						isPasswordChanged: false,
+					}),
+				),
+			);
+
+			return {
+				recoveredCount: recovered.length,
+				remainingCount: entries.length - recovered.length,
+			};
+		},
+	);
+};
+
 const useDeletePassword = () => useInvalidatingMutation(deletePasswordEntry);
 
 const useRestorePassword = () => useInvalidatingMutation(restorePasswordEntry);
@@ -123,6 +168,7 @@ export {
 	useCreatePassword,
 	useDeleteCategory,
 	useDeletePassword,
+	useRecoverEntries,
 	useRestorePassword,
 	useUnlockVault,
 	useUpdateCategory,

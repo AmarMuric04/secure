@@ -6,6 +6,7 @@ export {
 export { toFaviconUrls } from "./faviconUrl";
 export { calculatePasswordStrength, STRENGTH_LABELS } from "./passwordStrength";
 export { type decryptVault } from "./vaultEntries";
+export { readRecoverySalts, recoverEntries } from "./entryRecovery";
 export {
 	buildCategoryFolders,
 	countFiledEntries,

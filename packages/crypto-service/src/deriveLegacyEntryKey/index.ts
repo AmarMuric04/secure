@@ -1,0 +1,1 @@
+export { deriveLegacyEntryKey } from "./deriveLegacyEntryKey";
