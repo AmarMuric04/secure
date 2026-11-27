@@ -2,7 +2,6 @@ import { ArrowDownToLine, RefreshCw } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 
-import { ScrambleText } from "@/components/shared/ScrambleText";
 import { Button } from "@/components/ui";
 import { EASE_OUT } from "@/lib/motion";
 
@@ -24,9 +23,7 @@ const GeneratedPreview: React.FC<{
 				aria-live="polite"
 				className="min-h-17 px-4 pt-3.5 pb-2 font-mono text-[15px] leading-6 break-all"
 			>
-				{value ? (
-					<ScrambleText text={value} />
-				) : (
+				{value || (
 					<span className="font-sans text-sm text-destructive">
 						Your options leave no characters to choose from
 					</span>

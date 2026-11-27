@@ -52,8 +52,6 @@
 	--color-band: var(--band);
 	--color-band-foreground: var(--band-foreground);
 	--color-band-muted: var(--band-muted);
-	--color-sand: var(--sand);
-	--color-sand-ink: var(--sand-ink);
 	--shadow-panel: var(--panel-shadow);
 	--shadow-pop: var(--pop-shadow);
 	--radius-sm: calc(var(--radius) - 4px);
@@ -93,8 +91,6 @@
 	--band: #1f5c4f;
 	--band-foreground: #f3f2ee;
 	--band-muted: #a9c8bd;
-	--sand: #ebe6da;
-	--sand-ink: #d8d0bf;
 	--border: #e9e7e1;
 	--input: #dcdad3;
 	--ring: #1f5c4f;
@@ -147,8 +143,6 @@
 	--band: #12302a;
 	--band-foreground: #ecebe6;
 	--band-muted: #86b3a4;
-	--sand: #1c1a16;
-	--sand-ink: #2c2922;
 	--border: #2a2b28;
 	--input: #383935;
 	--ring: #76c2ac;

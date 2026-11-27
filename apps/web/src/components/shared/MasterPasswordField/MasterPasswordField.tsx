@@ -53,7 +53,7 @@ const MasterPasswordField: React.FC<{
 				onBlur={() => setIsFocused(false)}
 				onSelect={handleSelect}
 				className={cn(
-					"h-14.5 w-full rounded-[18px] bg-card pl-5 font-mono text-[17px] tracking-[0.08em] ring-1 ring-input transition-[box-shadow] duration-250 ease-out-quint outline-none placeholder:font-sans placeholder:text-[15px] placeholder:tracking-normal placeholder:text-subtle focus:ring-2 focus:ring-primary focus:placeholder:opacity-60 disabled:opacity-70",
+					"h-14.5 w-full rounded-[18px] bg-card pl-5 font-mono text-[17px] ring-1 ring-input transition-[box-shadow] duration-250 ease-out-quint outline-none placeholder:font-sans placeholder:text-[15px] placeholder:text-subtle focus:ring-2 focus:ring-primary focus:placeholder:opacity-60 disabled:opacity-70",
 					submit ? "pr-26" : "pr-14",
 					!isRevealed &&
 						"text-transparent caret-transparent selection:bg-transparent selection:text-transparent",

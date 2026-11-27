@@ -28,7 +28,7 @@ export function LoadingOverlay({
 	message = "Loading...",
 }: LoadingOverlayProps) {
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/25 backdrop-blur-[2px]">
+		<div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/25">
 			<div className="flex flex-col items-center gap-4 rounded-2xl bg-popover p-8 shadow-pop">
 				<Spinner size="lg" />
 				<p className="text-muted-foreground">{message}</p>
