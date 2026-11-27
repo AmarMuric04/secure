@@ -6,31 +6,24 @@ import { Button } from "@/components/ui";
 
 import { revealProps } from "../landingMotion";
 
-const INVERTED_BUTTON =
-	"bg-band-foreground text-band hover:bg-band-foreground/90";
-
-const ClosingActions: React.FC<{ isAuthenticated: boolean }> = ({
+const ClosingNote: React.FC<{ isAuthenticated: boolean }> = ({
 	isAuthenticated,
 }) => {
 	if (isAuthenticated) {
-		return (
-			<Button asChild size="xl" className={INVERTED_BUTTON}>
-				<Link to="/vault">Open your vault</Link>
-			</Button>
-		);
+		return <>Everything in it is still sealed until you unlock it.</>;
 	}
 
 	return (
 		<>
-			<Button asChild size="xl" className={INVERTED_BUTTON}>
-				<Link to="/register">Create your vault</Link>
-			</Button>
+			Add the rest when you’re ready, or import them from the manager you
+			use today. Already have a vault?{" "}
 			<Link
 				to="/login"
-				className="text-[15px] font-medium underline decoration-band-foreground/40 underline-offset-4 transition-colors hover:decoration-band-foreground"
+				className="text-band-foreground underline decoration-band-foreground/40 underline-offset-4 transition-colors hover:decoration-band-foreground"
 			>
 				Sign in
 			</Link>
+			.
 		</>
 	);
 };
@@ -51,14 +44,21 @@ const LandingClosing: React.FC<{ isAuthenticated: boolean }> = ({
 							: "Start with one password."}
 					</p>
 					<p className="mt-4 text-pretty text-band-muted">
-						Add the rest when you’re ready, or import them from the
-						manager you use today.
+						<ClosingNote isAuthenticated={isAuthenticated} />
 					</p>
 				</div>
 
-				<div className="flex shrink-0 items-center gap-6">
-					<ClosingActions isAuthenticated={isAuthenticated} />
-				</div>
+				<Button
+					asChild
+					size="xl"
+					className="w-fit shrink-0 bg-band-foreground text-band hover:bg-band-foreground/90"
+				>
+					<Link to={isAuthenticated ? "/vault" : "/register"}>
+						{isAuthenticated
+							? "Open your vault"
+							: "Create your vault"}
+					</Link>
+				</Button>
 			</motion.div>
 
 			<div className="flex flex-col gap-3 py-10 text-sm text-subtle sm:flex-row sm:items-center sm:justify-between">

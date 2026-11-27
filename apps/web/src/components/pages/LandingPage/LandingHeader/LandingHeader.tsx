@@ -31,7 +31,7 @@ const HeaderActions: React.FC<{
 		<>
 			<Link
 				to="/login"
-				className="px-2 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+				className="px-2 py-1 text-sm whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground"
 			>
 				Sign in
 			</Link>
@@ -86,7 +86,7 @@ const LandingHeader: React.FC<{
 						isDark ? "Switch to light mode" : "Switch to dark mode"
 					}
 					onClick={handleThemeToggle}
-					className="grid size-9 place-items-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
+					className="hidden size-9 place-items-center rounded-md text-muted-foreground transition-colors hover:text-foreground sm:grid"
 				>
 					{isDark ? (
 						<Sun className="size-4" />
