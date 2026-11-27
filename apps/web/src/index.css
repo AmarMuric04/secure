@@ -182,6 +182,13 @@
 	body {
 		@apply bg-background text-foreground antialiased;
 	}
+	:where(.overflow-auto, .overflow-y-auto):not([data-slot], .fixed) {
+		scrollbar-gutter: stable;
+	}
+	button:not(:disabled),
+	[role="button"]:not([aria-disabled="true"]) {
+		cursor: pointer;
+	}
 }
 
 @keyframes dial-dot-in {

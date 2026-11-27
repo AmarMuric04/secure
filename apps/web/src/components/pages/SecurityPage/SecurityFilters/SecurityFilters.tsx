@@ -23,7 +23,7 @@ const FilterLink: React.FC<{
 			replace
 			aria-current={isActive ? "page" : undefined}
 			className={cn(
-				"relative flex h-9 shrink-0 items-center gap-2.5 rounded-lg px-2.5 text-sm transition-colors duration-200",
+				"relative flex h-9 w-full min-w-0 items-center gap-2.5 rounded-lg px-2.5 text-sm transition-colors duration-200",
 				isActive
 					? "text-foreground"
 					: "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
@@ -42,7 +42,9 @@ const FilterLink: React.FC<{
 					count > 0 ? tone : "text-subtle",
 				)}
 			/>
-			<span className="relative flex-1 font-medium">{label}</span>
+			<span className="relative min-w-0 flex-1 truncate font-medium">
+				{label}
+			</span>
 			<span className="relative font-mono text-xs text-subtle tabular-nums">
 				{count}
 			</span>
@@ -58,7 +60,7 @@ const SecurityFilters: React.FC<{
 	return (
 		<nav
 			aria-label="Issue types"
-			className="-mx-1 flex gap-1 overflow-x-auto px-1 md:sticky md:top-0 md:mx-0 md:flex-col md:self-start md:overflow-visible md:px-0"
+			className="-mx-1 grid auto-cols-[minmax(8.5rem,1fr)] grid-flow-col gap-1 overflow-x-auto px-1 md:sticky md:top-0 md:mx-0 md:auto-cols-auto md:grid-flow-row md:self-start md:overflow-visible md:px-0"
 		>
 			<FilterLink
 				issue={undefined}

@@ -1,4 +1,4 @@
-import { Sparkles, X } from "lucide-react";
+import { Dices, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { PasswordGenerator } from "@/components/shared/PasswordGenerator";
@@ -24,7 +24,7 @@ const GeneratorPanel: React.FC<{
 					<div className="mt-3 rounded-2xl bg-muted p-3 ring-1 ring-border">
 						<div className="mb-3 flex items-center justify-between pl-1">
 							<h2 className="flex items-center gap-1.5 text-[13px] font-medium">
-								<Sparkles className="size-3.5 text-primary" />
+								<Dices className="size-3.5 text-primary" />
 								Generator
 							</h2>
 							<Button

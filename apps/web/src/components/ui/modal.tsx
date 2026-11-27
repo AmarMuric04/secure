@@ -1,4 +1,5 @@
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 import { Button } from "./button";
@@ -46,8 +47,8 @@ export function Modal({
 
 	if (!isOpen) return null;
 
-	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center">
+	return createPortal(
+		<div className="fixed inset-0 z-50 flex items-center justify-center text-foreground">
 			{/* Backdrop */}
 			<div
 				className="absolute inset-0 animate-in bg-foreground/25 backdrop-blur-[2px] duration-200 fade-in dark:bg-black/60"
@@ -91,7 +92,8 @@ export function Modal({
 				{/* Content */}
 				<div className="p-6">{children}</div>
 			</div>
-		</div>
+		</div>,
+		document.body,
 	);
 }
 

@@ -2,12 +2,12 @@ import { Link } from "@tanstack/react-router";
 import type { buildVaultAnalytics } from "business-logic-secure";
 import {
 	AlertTriangle,
+	Brush,
 	CheckCircle2,
 	ChevronRight,
 	Copy,
 	Hourglass,
 	ShieldX,
-	Sparkles,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -47,7 +47,7 @@ const ISSUES = [
 		key: "tidy",
 		label: "Tidy up",
 		action: "Insecure addresses, duplicates, unused",
-		icon: Sparkles,
+		icon: Brush,
 		tone: "text-muted-foreground",
 	},
 ] as const;

@@ -1,8 +1,8 @@
 import {
+	Brush,
 	Hourglass,
 	Repeat2,
 	ShieldAlert,
-	Sparkles,
 	TriangleAlert,
 } from "lucide-react";
 
@@ -43,7 +43,7 @@ const FILTER_DETAILS = {
 		label: "Tidy up",
 		title: "Suggestions",
 		hint: "Not urgent. Insecure addresses, duplicates and accounts you no longer use.",
-		icon: Sparkles,
+		icon: Brush,
 		tone: "text-muted-foreground",
 	},
 };
