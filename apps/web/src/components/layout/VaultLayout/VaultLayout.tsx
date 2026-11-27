@@ -1,9 +1,4 @@
-import {
-	Navigate,
-	Outlet,
-	useLocation,
-	useMatches,
-} from "@tanstack/react-router";
+import { Navigate, Outlet, useMatches } from "@tanstack/react-router";
 import { secure } from "business-logic-secure";
 import { motion } from "motion/react";
 import { useState } from "react";
@@ -24,13 +19,13 @@ const UnlockedVault: React.FC<{ autoLockMinutes: number }> = ({
 }) => {
 	const { lock } = secure.vault.useVaultLock();
 	const matches = useMatches();
-	const { pathname } = useLocation();
 
 	const lockAtRef = useAutoLock({ minutes: autoLockMinutes, onLock: lock });
 
 	const isSplitView = matches.some(
 		(match) => match.routeId === SPLIT_VIEW_ROUTE_ID,
 	);
+	const renderedPathname = matches.at(-1)?.pathname;
 
 	return (
 		<SidebarProvider>
@@ -39,11 +34,11 @@ const UnlockedVault: React.FC<{ autoLockMinutes: number }> = ({
 				<header className="flex h-12 shrink-0 items-center gap-2 border-b px-2 md:hidden">
 					<SidebarTrigger className="size-9" />
 					<VaultMark size="sm" />
-					<span className="font-semibold">SecureVault</span>
+					<span className="font-semibold">Sealed</span>
 				</header>
 
 				<motion.div
-					key={pathname}
+					key={renderedPathname}
 					initial={{ opacity: 0, y: 8 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.35, ease: EASE_OUT }}
@@ -77,7 +72,7 @@ const VaultLayout: React.FC = () => {
 	}
 
 	if (isPending) {
-		return <VaultSplash message="Checking your session..." />;
+		return <VaultSplash message="Checking your session" />;
 	}
 
 	if (!user) {

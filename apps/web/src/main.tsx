@@ -10,6 +10,7 @@ import { routeTree } from "./routeTree.gen";
 const router = createRouter({
 	routeTree,
 	defaultErrorComponent: ErrorPage,
+	defaultPreload: "intent",
 	scrollRestoration: true,
 });
 

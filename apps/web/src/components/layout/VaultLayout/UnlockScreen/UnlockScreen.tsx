@@ -32,7 +32,7 @@ const UnlockScreen: React.FC<{
 	};
 
 	if (isPending) {
-		return <VaultSplash message="Loading vault..." />;
+		return <VaultSplash message="Fetching your encrypted keys" />;
 	}
 
 	return (
@@ -49,7 +49,7 @@ const UnlockScreen: React.FC<{
 				className="absolute top-5 left-4 flex items-center gap-2.5 font-semibold tracking-tight sm:left-6"
 			>
 				<VaultMark size="sm" />
-				SecureVault
+				Sealed
 			</div>
 
 			<div
