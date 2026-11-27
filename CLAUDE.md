@@ -102,7 +102,7 @@ component only calls `mutate`.
 - Plain exports: `calculatePasswordStrength(password)` →
   `{ score, label, entropy, crackTime, feedback, isWeak }`, `STRENGTH_LABELS`,
   `generatePassword(options)`, `generatePassphrase(options)`,
-  `toFaviconUrls({ url, title })`, `readErrorCause(error)`, and `type decryptVault` for
+  `toFaviconUrls(url)`, `readErrorCause(error)`, and `type decryptVault` for
   typing props: `Awaited<ReturnType<typeof decryptVault>>["passwords"][number]`.
 
 The user's settings come from `secure.auth.useSession().data.settings`

@@ -15,9 +15,7 @@ const SiteIcon: React.FC<{
 	const [failedUrls, setFailedUrls] = useState<string[]>([]);
 	const [loadedUrl, setLoadedUrl] = useState<string | null>(null);
 
-	const candidates = user?.settings.showFavicons
-		? toFaviconUrls({ url, title })
-		: [];
+	const candidates = user?.settings.showFavicons ? toFaviconUrls(url) : [];
 	const currentUrl = candidates.find(
 		(candidate) => !failedUrls.includes(candidate),
 	);
