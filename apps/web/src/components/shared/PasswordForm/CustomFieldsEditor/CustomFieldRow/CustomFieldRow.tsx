@@ -4,9 +4,11 @@ import {
 } from "business-logic-secure";
 import { X } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 
 import {
 	Button,
+	PasswordDots,
 	Select,
 	SelectContent,
 	SelectItem,
@@ -14,6 +16,8 @@ import {
 	SelectValue,
 } from "@/components/ui";
 import { EASE_OUT } from "@/lib/motion";
+import { useInputSelection } from "@/lib/useInputSelection";
+import { cn } from "@/lib/utils";
 
 const TYPE_LABELS = {
 	text: "Text",
@@ -28,6 +32,11 @@ const CustomFieldRow: React.FC<{
 	) => void;
 	onRemove: () => void;
 }> = ({ field, onChange, onRemove }) => {
+	const [isValueFocused, setIsValueFocused] = useState(false);
+	const { selection, handleSelect } = useInputSelection();
+
+	const isMasked = field.type !== "text";
+
 	const handleTypeChange = (value: string) => {
 		const type = CUSTOM_FIELD_TYPES.find((option) => option === value);
 
@@ -56,17 +65,34 @@ const CustomFieldRow: React.FC<{
 					className="h-9 min-w-0 bg-transparent text-[13px] text-muted-foreground outline-none placeholder:text-subtle focus:text-foreground"
 				/>
 
-				<input
-					aria-label="Field value"
-					placeholder="Value"
-					type={field.type === "text" ? "text" : "password"}
-					autoComplete="off"
-					value={field.value}
-					onChange={(event) =>
-						onChange({ ...field, value: event.target.value })
-					}
-					className="h-9 min-w-0 bg-transparent text-[15px] outline-none placeholder:text-subtle max-sm:order-last max-sm:col-span-3"
-				/>
+				<div className="relative min-w-0 max-sm:order-last max-sm:col-span-3">
+					<input
+						aria-label="Field value"
+						placeholder="Value"
+						type={isMasked ? "password" : "text"}
+						autoComplete="off"
+						value={field.value}
+						onChange={(event) =>
+							onChange({ ...field, value: event.target.value })
+						}
+						onFocus={() => setIsValueFocused(true)}
+						onBlur={() => setIsValueFocused(false)}
+						onSelect={handleSelect}
+						className={cn(
+							"h-9 w-full bg-transparent text-[15px] outline-none placeholder:text-subtle",
+							isMasked &&
+								"text-transparent caret-transparent selection:bg-transparent selection:text-transparent",
+						)}
+					/>
+					{isMasked && (
+						<PasswordDots
+							length={field.value.length}
+							isFocused={isValueFocused}
+							selection={selection}
+							className="right-0 -left-[2.5px]"
+						/>
+					)}
+				</div>
 
 				<Select value={field.type} onValueChange={handleTypeChange}>
 					<SelectTrigger

@@ -2,7 +2,7 @@ export { useIsMobile } from "./use-mobile";
 
 export { Button, buttonVariants } from "./button";
 
-export { Input, PasswordInput } from "./input";
+export { Input, PasswordDots, PasswordInput } from "./input";
 
 export {
 	Card,

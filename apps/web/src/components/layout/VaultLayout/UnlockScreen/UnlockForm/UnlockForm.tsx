@@ -2,9 +2,8 @@ import { secure } from "business-logic-secure";
 import { useEffect, useRef, useState } from "react";
 
 import { CombinationDial } from "@/components/shared/CombinationDial";
+import { MasterPasswordField } from "@/components/shared/MasterPasswordField";
 import { cn } from "@/lib/utils";
-
-import { MasterPasswordField } from "../MasterPasswordField";
 
 const MIN_MASTER_PASSWORD_LENGTH = 12;
 

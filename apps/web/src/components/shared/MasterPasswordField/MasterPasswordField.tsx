@@ -1,9 +1,9 @@
 import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 
+import { PasswordDots } from "@/components/ui";
+import { useInputSelection } from "@/lib/useInputSelection";
 import { cn } from "@/lib/utils";
-
-const VISIBLE_DOT_COUNT = 16;
 
 const MasterPasswordField: React.FC<{
 	value: string;
@@ -28,6 +28,7 @@ const MasterPasswordField: React.FC<{
 }) => {
 	const [isRevealed, setIsRevealed] = useState(false);
 	const [isFocused, setIsFocused] = useState(false);
+	const { selection, handleSelect } = useInputSelection();
 
 	const isReady = value.length > 0;
 
@@ -50,34 +51,25 @@ const MasterPasswordField: React.FC<{
 				onKeyUp={handleKeyUp}
 				onFocus={() => setIsFocused(true)}
 				onBlur={() => setIsFocused(false)}
+				onSelect={handleSelect}
 				className={cn(
 					"h-14.5 w-full rounded-[18px] bg-card pl-5 font-mono text-[17px] tracking-[0.08em] shadow-pop ring-1 ring-border transition-[box-shadow] duration-250 ease-out-quint outline-none placeholder:font-sans placeholder:text-[15px] placeholder:tracking-normal placeholder:text-subtle focus:ring-2 focus:ring-primary focus:placeholder:opacity-60 disabled:opacity-70",
 					submit ? "pr-26" : "pr-14",
-					!isRevealed && "text-transparent caret-transparent",
+					!isRevealed &&
+						"text-transparent caret-transparent selection:bg-transparent selection:text-transparent",
 					isInvalid &&
 						"ring-2 ring-destructive focus:ring-destructive",
 				)}
 			/>
 
 			{!isRevealed && (
-				<div
-					aria-hidden="true"
-					className={cn(
-						"pointer-events-none absolute inset-y-0 left-5 flex items-center gap-[7px] overflow-hidden",
-						submit ? "right-26" : "right-14",
-						value.length > VISIBLE_DOT_COUNT && "justify-end",
-					)}
-				>
-					{Array.from(value, (_, index) => (
-						<i
-							key={index}
-							className="size-2.25 shrink-0 rounded-full bg-foreground motion-safe:animate-[dial-dot-in_0.3s_var(--ease-pop)_both]"
-						/>
-					))}
-					{isFocused && (
-						<span className="h-5.5 w-0.5 shrink-0 rounded-full bg-primary motion-safe:animate-[caret-blink_1s_steps(1)_infinite]" />
-					)}
-				</div>
+				<PasswordDots
+					length={value.length}
+					isFocused={isFocused}
+					selection={selection}
+					size="lg"
+					className={cn("left-4", submit ? "right-26" : "right-14")}
+				/>
 			)}
 
 			<button
