@@ -66,7 +66,7 @@ const DataSettingsPage: React.FC = () => {
 		>,
 	) => {
 		setImportSource({
-			label: `SecureVault backup · ${backupFile?.name ?? ""}`,
+			label: `Sealed backup · ${backupFile?.name ?? ""}`,
 			isPlaintextFile: false,
 			entries: payload.entries,
 			invalid: [],
@@ -100,7 +100,7 @@ const DataSettingsPage: React.FC = () => {
 						/>
 					</SettingsRow>
 					<SettingsRow
-						label="From a SecureVault backup"
+						label="From a Sealed backup"
 						description={`A ${BACKUP_FILE_EXTENSION} file you downloaded earlier`}
 					>
 						<FilePickerButton

@@ -6,7 +6,7 @@ const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 const STEP_SECONDS = 30;
 const CODE_DIGITS = 6;
 const DRIFT_STEPS = 1;
-const ISSUER = "SecureVault";
+const ISSUER = "Sealed";
 
 const encodeBase32 = (bytes: Uint8Array) => {
 	let output = "";

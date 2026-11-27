@@ -16,7 +16,7 @@ const SettingsPage: React.FC = () => {
 		<>
 			<SettingsPageHeader
 				title="General"
-				description="How SecureVault looks and behaves on this account"
+				description="How Sealed looks and behaves on this account"
 			/>
 
 			<div className="space-y-12">

@@ -46,12 +46,12 @@ const AppSidebar: React.FC<{ lockAtRef: React.RefObject<number> }> = ({
 			<SidebarHeader className="flex-row items-center gap-1 px-3 pt-3 pb-4 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:px-2">
 				<Link
 					to="/vault"
-					aria-label="SecureVault"
+					aria-label="Sealed"
 					className="flex min-w-0 items-center gap-2.5 text-[15px] font-semibold tracking-tight"
 				>
 					<VaultMark size="sm" />
 					<span className="truncate group-data-[collapsible=icon]:hidden">
-						SecureVault
+						Sealed
 					</span>
 				</Link>
 				<SidebarTrigger

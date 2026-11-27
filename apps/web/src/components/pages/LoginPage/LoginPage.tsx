@@ -103,7 +103,7 @@ const LoginPage: React.FC = () => {
 					</form>
 
 					<p className="text-sm text-muted-foreground">
-						New to SecureVault?{" "}
+						New to Sealed?{" "}
 						<Link
 							to="/register"
 							className="font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground"

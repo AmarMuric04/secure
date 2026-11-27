@@ -15,7 +15,7 @@ const ProfileSettingsPage: React.FC = () => {
 		<>
 			<SettingsPageHeader
 				title="Profile"
-				description="How you appear in SecureVault"
+				description="How you appear in Sealed"
 			/>
 
 			<ProfileForm

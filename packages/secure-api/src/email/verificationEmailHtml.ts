@@ -26,7 +26,7 @@ const verificationEmailHtml = ({
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 400px; margin: 0 auto;">
 <tr>
 <td style="text-align: center; padding-bottom: 40px;">
-<span style="font-size: 20px; font-weight: 600; color: #ffffff; letter-spacing: -0.5px;">SecureVault</span>
+<span style="font-size: 20px; font-weight: 600; color: #ffffff; letter-spacing: -0.5px;">Sealed</span>
 </td>
 </tr>
 <tr>

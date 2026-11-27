@@ -33,11 +33,11 @@ const sendVerificationCode = async ({
 	const greeting = name ?? "there";
 
 	await transporter.sendMail({
-		from: `"SecureVault" <${env.SMTP_FROM ?? env.SMTP_USER}>`,
+		from: `"Sealed" <${env.SMTP_FROM ?? env.SMTP_USER}>`,
 		to: email,
-		subject: "Your verification code - SecureVault",
+		subject: "Your verification code - Sealed",
 		html: verificationEmailHtml({ greeting, code }),
-		text: `Hey ${greeting},\n\nYour SecureVault verification code is: ${code}\n\nIt expires in 15 minutes. Never share this code with anyone.\n\nIf you didn't request this code, ignore this email.`,
+		text: `Hey ${greeting},\n\nYour Sealed verification code is: ${code}\n\nIt expires in 15 minutes. Never share this code with anyone.\n\nIf you didn't request this code, ignore this email.`,
 	});
 };
 

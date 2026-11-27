@@ -116,7 +116,7 @@ const readBackupEnvelope = (text: string) => {
 	const parsed = backupEnvelopeSchema.safeParse(parseJson(text));
 
 	if (!parsed.success) {
-		throw new Error("This is not a SecureVault backup file");
+		throw new Error("This is not a Sealed backup file");
 	}
 
 	return parsed.data;
