@@ -1,1 +1,0 @@
-export { VaultChapter } from "./VaultChapter";

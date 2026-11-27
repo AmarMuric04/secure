@@ -1,1 +1,0 @@
-export { HeroDial } from "./HeroDial";

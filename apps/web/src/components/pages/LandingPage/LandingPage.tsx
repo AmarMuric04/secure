@@ -1,68 +1,42 @@
 import { secure } from "business-logic-secure";
-import { useState } from "react";
+import { MotionConfig } from "motion/react";
 
-import { GeneratorBand } from "./GeneratorBand";
+import { FeatureList } from "./FeatureList";
+import { GeneratorPanel } from "./GeneratorPanel";
 import { HeroSection } from "./HeroSection";
-import { KeyBand } from "./KeyBand";
+import { HowItWorks } from "./HowItWorks";
 import { LandingClosing } from "./LandingClosing";
 import { LandingHeader } from "./LandingHeader";
-import { LimitsChapter } from "./LimitsChapter";
-import { SealedChapter } from "./SealedChapter";
-import { VaultChapter } from "./VaultChapter";
+import { LimitsSection } from "./LimitsSection";
 
 const LandingPage: React.FC = () => {
 	const { data: user, isPending } = secure.auth.useSession();
 
-	const [phrase, setPhrase] = useState("");
-	const [isPhraseEdited, setIsPhraseEdited] = useState(false);
-
 	const isAuthenticated = !!user;
 
-	const handlePhraseEdit = (value: string) => {
-		setIsPhraseEdited(true);
-		setPhrase(value);
-	};
-
-	const handleSeal = () => {
-		document
-			.getElementById("sealed")
-			?.scrollIntoView({ behavior: "smooth", block: "start" });
-	};
-
 	return (
-		<div className="min-h-screen overflow-x-clip bg-background">
-			<LandingHeader
-				isLoading={isPending}
-				isAuthenticated={isAuthenticated}
-			/>
-
-			<main>
-				<HeroSection
-					phrase={phrase}
+		<MotionConfig reducedMotion="user">
+			<div className="min-h-screen overflow-x-clip bg-background">
+				<LandingHeader
+					isLoading={isPending}
 					isAuthenticated={isAuthenticated}
-					isPhraseEdited={isPhraseEdited}
-					onAutoType={setPhrase}
-					onPhraseEdit={handlePhraseEdit}
-					onSeal={handleSeal}
 				/>
 
-				<SealedChapter
-					phrase={phrase}
-					isEdited={isPhraseEdited}
-					onEdit={handlePhraseEdit}
-				/>
+				<main>
+					<HeroSection isAuthenticated={isAuthenticated} />
 
-				<KeyBand />
+					<HowItWorks />
 
-				<VaultChapter />
+					<FeatureList />
 
-				<GeneratorBand />
+					<GeneratorPanel />
 
-				<LimitsChapter />
-			</main>
+					<LimitsSection />
+				</main>
 
-			<LandingClosing isAuthenticated={isAuthenticated} />
-		</div>
+				<LandingClosing isAuthenticated={isAuthenticated} />
+			</div>
+		</MotionConfig>
 	);
 };
 

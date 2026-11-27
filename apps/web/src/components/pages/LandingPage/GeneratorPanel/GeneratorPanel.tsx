@@ -4,7 +4,6 @@ import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui";
-import { ScrambleText } from "@/components/shared/ScrambleText";
 import { cn } from "@/lib/utils";
 
 import { revealProps } from "../landingMotion";
@@ -55,8 +54,8 @@ const ChoiceButton: React.FC<{
 			className={cn(
 				"h-8 rounded-md px-3 text-sm transition-colors",
 				isActive
-					? "bg-foreground text-background"
-					: "text-muted-foreground hover:bg-sand-ink hover:text-foreground",
+					? "bg-card text-foreground shadow-panel"
+					: "text-muted-foreground hover:text-foreground",
 			)}
 		>
 			{label}
@@ -64,7 +63,7 @@ const ChoiceButton: React.FC<{
 	);
 };
 
-const GeneratorBand: React.FC = () => {
+const GeneratorPanel: React.FC = () => {
 	const [mode, setMode] = useState<keyof typeof MODES>("password");
 	const [size, setSize] = useState(24);
 	const [secret, setSecret] = useState("");
@@ -99,53 +98,54 @@ const GeneratorBand: React.FC = () => {
 	};
 
 	return (
-		<section className="bg-sand bg-[repeating-linear-gradient(135deg,transparent_0_14px,var(--sand-ink)_14px_15px)]">
-			<div className="mx-auto grid max-w-6xl gap-12 px-5 py-24 sm:px-8 lg:grid-cols-[20rem_minmax(0,1fr)] lg:py-32">
-				<motion.div {...revealProps({})}>
-					<p className="font-mono text-xs text-muted-foreground">
-						Generator
-					</p>
-					<h2 className="mt-5 text-3xl leading-tight font-semibold tracking-[-0.03em] text-balance sm:text-4xl">
-						Need a better one? Make it here.
-					</h2>
-					<p className="mt-4 text-sm text-pretty text-muted-foreground">
-						The same generator the vault uses, running on your
-						device. Nothing here is saved or sent.
-					</p>
-				</motion.div>
+		<section className="mx-auto grid max-w-6xl gap-12 px-5 pt-28 sm:px-8 lg:grid-cols-[22rem_minmax(0,1fr)] lg:gap-16 lg:pt-40">
+			<motion.div {...revealProps({})}>
+				<p className="text-sm font-medium text-primary">Generator</p>
+				<h2 className="mt-4 text-[2rem] leading-[1.1] font-medium tracking-[-0.035em] text-balance sm:text-5xl">
+					Need a better one? Make it here.
+				</h2>
+				<p className="mt-5 text-lg leading-relaxed text-pretty text-muted-foreground">
+					The same generator the vault uses, running on your device.
+					Nothing on this page is saved or sent.
+				</p>
+			</motion.div>
 
-				<motion.div
-					{...revealProps({ delay: 0.1 })}
-					className="self-center rounded-2xl bg-background p-5 shadow-panel sm:p-7"
-				>
-					<p className="h-24 overflow-hidden font-mono text-xl leading-8 tracking-tight break-all sm:h-18 sm:text-2xl sm:leading-9">
-						<ScrambleText text={secret} durationMs={500} />
+			<motion.div
+				{...revealProps({ delay: 0.08 })}
+				className="self-end rounded-[1.75rem] bg-accent/70 p-2 sm:p-3"
+			>
+				<div className="rounded-[1.25rem] bg-card p-5 shadow-panel sm:p-7">
+					<p className="min-h-16 font-mono text-xl leading-8 tracking-tight break-all sm:text-2xl sm:leading-9">
+						{secret}
 					</p>
 
 					<div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-5">
-						<div className="flex flex-wrap items-center gap-1">
-							{Object.entries(MODES).map(([key, option]) => (
-								<ChoiceButton
-									key={key}
-									label={option.label}
-									isActive={mode === key}
-									onSelect={() =>
-										handleModeSelect(
-											key as keyof typeof MODES,
-										)
-									}
-								/>
-							))}
-							<span className="mx-2 h-5 w-px bg-border" />
-							{MODES[mode].sizes.map((option) => (
-								<ChoiceButton
-									key={option}
-									label={String(option)}
-									isActive={size === option}
-									onSelect={() => setSize(option)}
-								/>
-							))}
-							<span className="ml-1 w-16 text-xs text-subtle">
+						<div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+							<div className="flex rounded-lg bg-accent p-0.5">
+								{Object.entries(MODES).map(([key, option]) => (
+									<ChoiceButton
+										key={key}
+										label={option.label}
+										isActive={mode === key}
+										onSelect={() =>
+											handleModeSelect(
+												key as keyof typeof MODES,
+											)
+										}
+									/>
+								))}
+							</div>
+							<div className="flex items-center rounded-lg bg-accent p-0.5">
+								{MODES[mode].sizes.map((option) => (
+									<ChoiceButton
+										key={option}
+										label={String(option)}
+										isActive={size === option}
+										onSelect={() => setSize(option)}
+									/>
+								))}
+							</div>
+							<span className="text-xs text-subtle">
 								{MODES[mode].unit}
 							</span>
 						</div>
@@ -169,10 +169,10 @@ const GeneratorBand: React.FC = () => {
 							</Button>
 						</div>
 					</div>
-				</motion.div>
-			</div>
+				</div>
+			</motion.div>
 		</section>
 	);
 };
 
-export { GeneratorBand };
+export { GeneratorPanel };

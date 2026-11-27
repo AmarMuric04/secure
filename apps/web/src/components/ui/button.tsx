@@ -18,6 +18,7 @@ const buttonVariants = cva(
 				outline:
 					"bg-card text-foreground ring-1 ring-input ring-inset hover:bg-accent",
 				secondary: "bg-accent text-accent-foreground hover:bg-input/70",
+				ink: "bg-foreground text-background hover:bg-foreground/85",
 				ghost: "text-muted-foreground hover:bg-accent hover:text-foreground",
 				link: "text-primary underline-offset-4 hover:underline",
 			},

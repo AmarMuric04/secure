@@ -1,1 +1,0 @@
-export { HeroField } from "./HeroField";
