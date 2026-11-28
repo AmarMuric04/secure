@@ -88,7 +88,7 @@ const PurgeCountdownNode: React.FC<{
 				className={cn(
 					"col-start-1 row-start-1 grid size-5 place-items-center rounded-full transition-[opacity,transform,background-color,box-shadow] duration-200 ease-out-quint",
 					isSelected
-						? "bg-primary text-primary-foreground"
+						? "bg-foreground text-background"
 						: "text-transparent ring-[1.5px] ring-input",
 					isCheckboxVisible
 						? "scale-100 opacity-100"

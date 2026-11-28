@@ -71,7 +71,7 @@ const TrashTimelineItem: React.FC<{
 			<div
 				className={cn(
 					"my-1 flex min-w-0 flex-1 items-center gap-3 rounded-xl px-3 py-2 transition-colors duration-200",
-					isSelected ? "bg-primary-soft" : "group-hover:bg-muted",
+					isSelected ? "bg-accent" : "group-hover:bg-muted",
 				)}
 			>
 				<span className="opacity-55 grayscale">

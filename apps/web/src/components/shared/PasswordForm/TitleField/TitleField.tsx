@@ -20,7 +20,7 @@ const TitleField: React.FC<{
 				autoComplete="off"
 				value={title}
 				onChange={(event) => onTitleChange(event.target.value)}
-				className="h-14 min-w-0 flex-1 bg-transparent text-[28px] font-semibold tracking-tight outline-none placeholder:text-input sm:text-[32px]"
+				className="h-14 min-w-0 flex-1 bg-transparent text-[28px] font-medium tracking-[-0.035em] outline-none placeholder:text-input sm:text-[32px]"
 			/>
 			<FavoriteStar favorite={favorite} onChange={onFavoriteChange} />
 		</div>

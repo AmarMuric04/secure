@@ -111,7 +111,7 @@ const VaultListPanel: React.FC<{
 		<>
 			<div className="px-4 pt-4 pb-3 sm:px-4.5 sm:pt-4.5">
 				<div className="mb-3.5 flex items-center gap-2.5">
-					<h1 className="truncate text-xl font-semibold tracking-tight">
+					<h1 className="truncate text-[1.375rem] leading-tight font-medium tracking-[-0.03em]">
 						{title}
 					</h1>
 					{!vault.isPending && (

@@ -54,7 +54,7 @@ const EntryHeader: React.FC<{
 				<VaultEntryAvatar entry={entry} size="lg" />
 
 				<div className="min-w-0 flex-1">
-					<h2 className="truncate text-2xl leading-tight font-semibold tracking-tight">
+					<h2 className="truncate text-[1.75rem] leading-[1.15] font-medium tracking-[-0.035em]">
 						{entry.title}
 					</h2>
 					{websiteLink && (
@@ -100,7 +100,7 @@ const EntryHeader: React.FC<{
 						asChild
 						variant="outline"
 						size="sm"
-						className="ml-1 rounded-lg bg-muted shadow-none dark:bg-muted"
+						className="ml-1"
 					>
 						<Link to="/vault/$id/edit" params={{ id: entry.id }}>
 							<Pencil className="size-3.5" />

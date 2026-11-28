@@ -15,25 +15,8 @@ export function Spinner({ size = "md", className }: SpinnerProps) {
 
 	return (
 		<Loader2
-			className={cn("animate-spin text-primary", sizes[size], className)}
+			className={cn("animate-spin text-subtle", sizes[size], className)}
 		/>
-	);
-}
-
-interface LoadingOverlayProps {
-	message?: string;
-}
-
-export function LoadingOverlay({
-	message = "Loading...",
-}: LoadingOverlayProps) {
-	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/25">
-			<div className="flex flex-col items-center gap-4 rounded-2xl bg-popover p-8 shadow-pop">
-				<Spinner size="lg" />
-				<p className="text-muted-foreground">{message}</p>
-			</div>
-		</div>
 	);
 }
 
@@ -55,16 +38,16 @@ export function EmptyState({
 	return (
 		<div
 			className={cn(
-				"flex flex-col items-center justify-center rounded-xl px-4 py-16 text-center ring-1 ring-border",
+				"flex flex-col items-center justify-center px-4 py-16 text-center",
 				className,
 			)}
 		>
 			{icon && (
-				<div className="mb-4 grid size-12 place-items-center rounded-xl bg-muted ring-1 ring-border [&_svg]:size-5 [&_svg]:text-muted-foreground">
+				<div className="mb-4 text-subtle [&_svg]:size-5">
 					{icon}
 				</div>
 			)}
-			<h3 className="mb-1 font-semibold tracking-tight text-foreground">
+			<h3 className="mb-1.5 text-xl font-medium tracking-[-0.02em] text-foreground">
 				{title}
 			</h3>
 			{description && (

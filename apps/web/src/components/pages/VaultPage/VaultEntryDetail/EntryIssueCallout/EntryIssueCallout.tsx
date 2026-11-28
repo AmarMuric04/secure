@@ -47,8 +47,8 @@ const ISSUE_MESSAGES = {
 const SEVERITY_STYLES = {
 	urgent: "bg-destructive/10 text-destructive",
 	warning: "bg-warning-soft text-warning",
-	notice: "bg-muted text-muted-foreground ring-1 ring-border",
-	suggestion: "bg-muted text-muted-foreground ring-1 ring-border",
+	notice: "text-muted-foreground ring-1 ring-border",
+	suggestion: "text-muted-foreground ring-1 ring-border",
 };
 
 const EntryIssueCallout: React.FC<{
@@ -67,7 +67,7 @@ const EntryIssueCallout: React.FC<{
 		>
 			<Icon className="size-4.5 shrink-0" />
 			<p className="min-w-0 flex-1">
-				<span className="font-semibold">
+				<span className="font-medium">
 					{ISSUE_MESSAGES[issue].title}
 				</span>{" "}
 				{ISSUE_MESSAGES[issue].detail}

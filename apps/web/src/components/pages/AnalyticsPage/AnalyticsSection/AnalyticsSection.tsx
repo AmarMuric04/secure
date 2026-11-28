@@ -13,7 +13,9 @@ const AnalyticsSection: React.FC<{
 				className,
 			)}
 		>
-			<h2 className="font-semibold tracking-tight">{title}</h2>
+			<h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
+				{title}
+			</h2>
 			{description && (
 				<p className="mt-0.5 text-[13px] text-subtle">{description}</p>
 			)}

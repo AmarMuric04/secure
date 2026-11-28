@@ -17,7 +17,7 @@ import { FieldRow } from "./FieldRow";
 import { PasswordHistory } from "./PasswordHistory";
 import { TotpCodeRow } from "./TotpCodeRow";
 
-const GROUP_CLASS_NAME = "mb-3 rounded-xl bg-muted";
+const GROUP_CLASS_NAME = "mb-4 rounded-xl ring-1 ring-border";
 
 const VaultEntryDetail: React.FC<{
 	entry: Awaited<ReturnType<typeof decryptVault>>["passwords"][number];

@@ -8,7 +8,7 @@ const PageHeader: React.FC<{
 	actions?: React.ReactNode;
 }> = ({ title, description, back, actions }) => {
 	return (
-		<header className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+		<header className="mb-8 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
 			<div className="min-w-0">
 				{back && (
 					<Link
@@ -19,11 +19,13 @@ const PageHeader: React.FC<{
 						{back.label}
 					</Link>
 				)}
-				<h1 className="text-2xl font-semibold tracking-tight">
+				<h1 className="text-[1.75rem] leading-[1.1] font-medium tracking-[-0.035em] text-balance sm:text-[2rem]">
 					{title}
 				</h1>
 				{description && (
-					<p className="mt-1 text-muted-foreground">{description}</p>
+					<p className="mt-2 text-pretty text-muted-foreground">
+						{description}
+					</p>
 				)}
 			</div>
 			{actions && (

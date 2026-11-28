@@ -30,9 +30,9 @@ const SecurityInboxList: React.FC<{
 					animate={{ opacity: 1, y: 0 }}
 					exit={{ opacity: 0, y: -4 }}
 					transition={{ duration: 0.18, ease: EASE_OUT }}
-					className="border-b border-border pb-3"
+					className="border-b border-foreground/15 pb-4"
 				>
-					<h2 className="font-semibold tracking-tight">
+					<h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
 						{details.title}
 					</h2>
 					<p className="mt-0.5 text-[13px] text-subtle">

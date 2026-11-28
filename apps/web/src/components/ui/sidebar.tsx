@@ -434,7 +434,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
 			title="Drag to resize, click to collapse"
 			className={cn(
 				"absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 touch-none transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-3 after:left-1/2 after:w-0.5 after:rounded-full after:transition-colors hover:after:bg-input sm:flex",
-				"group-data-[resizing=true]/sidebar-wrapper:after:bg-primary/60",
+				"group-data-[resizing=true]/sidebar-wrapper:after:bg-foreground/25",
 				"cursor-ew-resize [[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
 				"group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full hover:group-data-[collapsible=offcanvas]:bg-sidebar",
 				"[[data-side=left][data-collapsible=offcanvas]_&]:-right-2",

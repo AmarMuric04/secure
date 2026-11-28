@@ -21,10 +21,10 @@ const GeneratorPanel: React.FC<{
 					transition={{ duration: 0.32, ease: EASE_OUT }}
 					className="overflow-hidden"
 				>
-					<div className="mt-3 rounded-2xl bg-muted p-3 ring-1 ring-border">
+					<div className="mt-3 rounded-xl p-3 ring-1 ring-border">
 						<div className="mb-3 flex items-center justify-between pl-1">
 							<h2 className="flex items-center gap-1.5 text-[13px] font-medium">
-								<Dices className="size-3.5 text-primary" />
+								<Dices className="size-3.5 text-subtle" />
 								Generator
 							</h2>
 							<Button

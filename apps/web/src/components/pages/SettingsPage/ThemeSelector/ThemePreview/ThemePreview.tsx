@@ -5,6 +5,7 @@ const PALETTES = {
 		line: "#e3e1da",
 		strong: "#c9c6bd",
 		primary: "#1f5c4f",
+		ink: "#1c1b18",
 	},
 	dark: {
 		background: "#0f100f",
@@ -12,6 +13,7 @@ const PALETTES = {
 		line: "#2a2b28",
 		strong: "#4a4945",
 		primary: "#76c2ac",
+		ink: "#ecebe6",
 	},
 };
 
@@ -59,7 +61,7 @@ const MiniApp: React.FC<{ palette: (typeof PALETTES)["light"] }> = ({
 				/>
 				<span
 					className="mt-auto h-2.5 w-8 self-end rounded-[3px]"
-					style={{ backgroundColor: palette.primary }}
+					style={{ backgroundColor: palette.ink }}
 				/>
 			</div>
 		</div>

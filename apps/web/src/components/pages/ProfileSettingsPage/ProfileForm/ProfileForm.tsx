@@ -55,7 +55,7 @@ const ProfileForm: React.FC<{
 						src={avatarUrl ?? undefined}
 						alt={trimmedName || email}
 					/>
-					<AvatarFallback className="bg-accent text-2xl font-semibold text-foreground">
+					<AvatarFallback className="bg-accent text-2xl font-medium text-foreground">
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
 								key={initial}
@@ -73,7 +73,7 @@ const ProfileForm: React.FC<{
 					</AvatarFallback>
 				</Avatar>
 				<div className="min-w-0">
-					<p className="truncate text-lg font-semibold tracking-tight text-foreground">
+					<p className="truncate text-xl font-medium tracking-[-0.02em] text-foreground">
 						{trimmedName || "No display name"}
 					</p>
 					<p className="truncate text-sm text-muted-foreground">

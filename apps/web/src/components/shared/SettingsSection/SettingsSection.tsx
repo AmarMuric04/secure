@@ -7,7 +7,7 @@ const SettingsSection: React.FC<{
 }> = ({ title, description, footer, className, children }) => {
 	return (
 		<section className={className}>
-			<h2 className="text-[15px] font-semibold tracking-tight text-foreground">
+			<h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
 				{title}
 			</h2>
 			{description && (
@@ -15,7 +15,7 @@ const SettingsSection: React.FC<{
 					{description}
 				</p>
 			)}
-			<div className="mt-3 divide-y divide-border border-y border-border">
+			<div className="mt-4 divide-y divide-border border-t border-b border-t-foreground/15 border-b-border">
 				{children}
 			</div>
 			{footer && (

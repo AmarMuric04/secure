@@ -13,11 +13,11 @@ const StatTile: React.FC<{ label: string; value: number; note: string }> = ({
 	note,
 }) => {
 	return (
-		<div className="rounded-xl bg-muted p-4">
+		<div className="border-t border-foreground/15 pt-4 sm:pt-5">
 			<p className="text-[13px] text-muted-foreground">{label}</p>
 			<AnimatedNumber
 				value={value}
-				className="mt-1 block text-2xl font-semibold tracking-tight tabular-nums"
+				className="mt-1 block text-3xl font-medium tracking-[-0.035em] tabular-nums"
 			/>
 			<p className="mt-0.5 text-xs text-subtle">{note}</p>
 		</div>
@@ -29,7 +29,7 @@ const ScoreSummary: React.FC<{
 	stats: NonNullable<ReturnType<typeof buildVaultAnalytics>>["stats"];
 }> = ({ securityScore, stats }) => {
 	return (
-		<div className="grid gap-3 lg:grid-cols-[1.2fr_2fr]">
+		<div className="grid gap-6 lg:grid-cols-[1.2fr_2fr]">
 			<div className="rounded-xl p-5 ring-1 ring-border sm:p-6">
 				<p className="text-[13px] text-muted-foreground">
 					Security score
@@ -38,7 +38,7 @@ const ScoreSummary: React.FC<{
 					<AnimatedNumber
 						value={securityScore}
 						duration={1.1}
-						className="text-5xl font-semibold tracking-tight tabular-nums"
+						className="text-5xl font-medium tracking-[-0.045em] tabular-nums"
 					/>
 					<span className="text-subtle">/ 100</span>
 				</p>
@@ -52,7 +52,7 @@ const ScoreSummary: React.FC<{
 				/>
 			</div>
 
-			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+			<div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3 lg:self-end">
 				<StatTile
 					label="Passwords"
 					value={stats.total}

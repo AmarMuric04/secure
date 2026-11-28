@@ -30,7 +30,7 @@ function ResizableHandle({
 			className={cn(
 				"group/handle relative flex w-px shrink-0 items-center justify-center bg-border outline-none",
 				"after:absolute after:inset-y-0 after:left-1/2 after:w-0.5 after:-translate-x-1/2 after:bg-transparent after:transition-colors after:duration-200",
-				"data-[separator=active]:after:bg-primary/60 data-[separator=focus]:after:bg-primary/60 data-[separator=hover]:after:bg-input",
+				"data-[separator=active]:after:bg-foreground/25 data-[separator=focus]:after:bg-foreground/25 data-[separator=hover]:after:bg-input",
 				className,
 			)}
 			{...props}

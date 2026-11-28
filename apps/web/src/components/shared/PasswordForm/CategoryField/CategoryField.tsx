@@ -155,7 +155,7 @@ const CategoryField: React.FC<{
 					<button
 						type="button"
 						onClick={() => setIsCreating(true)}
-						className="flex h-8 w-full items-center gap-2 rounded-lg px-2 text-sm text-primary outline-none hover:bg-accent focus-visible:bg-accent"
+						className="flex h-8 w-full items-center gap-2 rounded-lg px-2 text-sm text-foreground outline-none hover:bg-accent focus-visible:bg-accent"
 					>
 						<Plus className="size-3.5" />
 						New category

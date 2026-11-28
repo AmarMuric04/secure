@@ -9,15 +9,14 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
 import { QueryErrorState } from "@/components/shared/QueryErrorState";
-import { useToast } from "@/components/ui";
+import { EmptyState, useToast } from "@/components/ui";
 import { EASE_OUT } from "@/lib/motion";
-import { cn } from "@/lib/utils";
 
 import { CategoriesHeader } from "./CategoriesHeader";
-import { CategoryFolder } from "./CategoryFolder";
+import { CategoriesSkeleton } from "./CategoriesSkeleton";
+import { CategoryRow } from "./CategoryRow";
+import { CreateCategoryModal } from "./CreateCategoryModal";
 import { EditCategoryModal } from "./EditCategoryModal";
-import { FoldersSkeleton } from "./FoldersSkeleton";
-import { NewFolderTile } from "./NewFolderTile";
 
 const PREVIEW_SIZE = 3;
 
@@ -82,9 +81,10 @@ const CategoriesPage: React.FC = () => {
 				summary={summary}
 				searchQuery={searchQuery}
 				onSearchChange={setSearchQuery}
+				onCreate={() => setIsCreating(true)}
 			/>
 
-			{vault.isPending && <FoldersSkeleton />}
+			{vault.isPending && <CategoriesSkeleton />}
 
 			{vault.isError && (
 				<QueryErrorState
@@ -94,36 +94,23 @@ const CategoriesPage: React.FC = () => {
 				/>
 			)}
 
-			{vault.isSuccess && (
-				<ul className="grid grid-cols-1 gap-x-5 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
-					{!searchQuery && (
-						<motion.li
-							layout
-							transition={{ duration: 0.4, ease: EASE_OUT }}
-							className={cn(isCreating && "sm:col-span-2")}
-						>
-							<NewFolderTile
-								isOpen={isCreating}
-								onOpenChange={setIsCreating}
-							/>
-						</motion.li>
-					)}
-
-					<AnimatePresence mode="popLayout">
+			{vault.isSuccess && visibleFolders.length > 0 && (
+				<ul className="divide-y divide-border border-y border-t-foreground/15 border-b-border">
+					<AnimatePresence initial={false}>
 						{visibleFolders.map((folder, index) => (
 							<motion.li
 								key={folder.category.id}
 								layout
-								initial={{ opacity: 0, y: 12 }}
+								initial={{ opacity: 0, y: 8 }}
 								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, scale: 0.94 }}
+								exit={{ opacity: 0 }}
 								transition={{
-									duration: 0.45,
+									duration: 0.35,
 									ease: EASE_OUT,
-									delay: Math.min(index, 9) * 0.04,
+									delay: Math.min(index, 9) * 0.03,
 								}}
 							>
-								<CategoryFolder
+								<CategoryRow
 									folder={folder}
 									onEdit={() =>
 										setEditingCategory(folder.category)
@@ -138,10 +125,21 @@ const CategoriesPage: React.FC = () => {
 				</ul>
 			)}
 
+			{vault.isSuccess && allFolders.length === 0 && (
+				<EmptyState
+					title="No categories yet"
+					description="Make one for work, banking or anything else, then file logins into it from the entry form."
+				/>
+			)}
+
 			{vault.isSuccess && searchQuery && visibleFolders.length === 0 && (
 				<p className="py-16 text-center text-sm text-muted-foreground">
 					No category matches “{searchQuery}”.
 				</p>
+			)}
+
+			{isCreating && (
+				<CreateCategoryModal onClose={() => setIsCreating(false)} />
 			)}
 
 			{editingCategory && (
