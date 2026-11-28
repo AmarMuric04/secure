@@ -103,7 +103,7 @@ const TotpCodeRow: React.FC<{ secret: string }> = ({ secret }) => {
 					}
 					className={cn(
 						"transition-[stroke-dashoffset] duration-1000 ease-linear",
-						isUrgent ? "stroke-warning" : "stroke-primary",
+						isUrgent ? "stroke-warning" : "stroke-foreground",
 					)}
 				/>
 			</svg>

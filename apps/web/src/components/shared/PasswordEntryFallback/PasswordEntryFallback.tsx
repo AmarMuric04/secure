@@ -22,7 +22,7 @@ const PasswordEntryFallback: React.FC<{
 					<div className="pl-4">
 						<Skeleton className="mb-3 h-3.5 w-16" />
 						<div className="flex items-center gap-4">
-							<Skeleton className="size-14 rounded-2xl" />
+							<Skeleton className="size-14 rounded-[17px]" />
 							<Skeleton className="h-8 w-64" />
 						</div>
 						<div className="mt-8 border-t border-border">
@@ -37,7 +37,7 @@ const PasswordEntryFallback: React.FC<{
 							))}
 						</div>
 					</div>
-					<Skeleton className="hidden h-44 rounded-2xl xl:block" />
+					<Skeleton className="hidden h-44 rounded-xl xl:block" />
 				</div>
 			</div>
 		);

@@ -28,7 +28,7 @@ const EntryPreview: React.FC<{
 	return (
 		<div>
 			<p className="mb-2 pl-1 text-xs font-medium text-subtle">Preview</p>
-			<div className="rounded-2xl bg-card p-4 shadow-panel ring-1 ring-border">
+			<div className="rounded-xl bg-card p-4 ring-1 ring-border">
 				<div className="flex items-center gap-3">
 					<EntryMonogram title={values.title} url={values.url} />
 					<div className="min-w-0 flex-1">

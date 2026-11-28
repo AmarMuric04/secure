@@ -20,7 +20,7 @@ const VaultSearchInput: React.FC<{
 				aria-label={placeholder}
 				value={value}
 				onChange={(event) => onChange(event.target.value)}
-				className="h-9.5 rounded-lg border-0 bg-muted pr-9 pl-9 shadow-none ring-1 ring-border transition-[box-shadow,background-color] duration-200 placeholder:text-subtle focus-visible:bg-card focus-visible:ring-2 focus-visible:ring-primary dark:bg-muted"
+				className="h-9.5 rounded-lg border-0 pr-9 pl-9 shadow-none ring-1 ring-input placeholder:text-subtle focus-visible:ring-2 focus-visible:ring-primary"
 			/>
 			{value ? (
 				<button

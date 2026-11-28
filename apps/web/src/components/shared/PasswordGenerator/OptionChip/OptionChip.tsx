@@ -25,7 +25,7 @@ const OptionChip: React.FC<{
 				className={cn(
 					"grid size-3.5 place-items-center rounded-[4px] transition-colors duration-200",
 					checked
-						? "bg-primary text-primary-foreground"
+						? "bg-foreground text-background"
 						: "ring-1 ring-input",
 				)}
 			>

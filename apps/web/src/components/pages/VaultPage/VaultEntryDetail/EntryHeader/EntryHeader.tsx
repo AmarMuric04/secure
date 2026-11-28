@@ -100,7 +100,7 @@ const EntryHeader: React.FC<{
 						asChild
 						variant="outline"
 						size="sm"
-						className="ml-1 rounded-lg bg-muted shadow-none dark:bg-muted"
+						className="ml-1"
 					>
 						<Link to="/vault/$id/edit" params={{ id: entry.id }}>
 							<Pencil className="size-3.5" />

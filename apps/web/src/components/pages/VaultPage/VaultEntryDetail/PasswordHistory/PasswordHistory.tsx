@@ -49,7 +49,7 @@ const PasswordHistory: React.FC<{
 	}
 
 	return (
-		<div className="mb-3 rounded-xl bg-muted">
+		<div className="mb-4 rounded-xl ring-1 ring-border">
 			<button
 				type="button"
 				aria-expanded={isOpen}
@@ -91,7 +91,7 @@ const PasswordHistory: React.FC<{
 									type="button"
 									disabled={updatePassword.isPending}
 									onClick={() => handleRestore(index)}
-									className="mt-1 text-xs font-medium text-primary transition-opacity hover:opacity-80 disabled:opacity-50"
+									className="mt-1 text-xs font-medium text-foreground underline decoration-foreground/30 underline-offset-4 transition-colors hover:decoration-foreground disabled:opacity-50"
 								>
 									Restore this password
 								</button>

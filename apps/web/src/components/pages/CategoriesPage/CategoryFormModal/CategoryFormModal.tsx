@@ -40,7 +40,7 @@ const CategoryFormModal: React.FC<{
 						autoFocus
 						value={name}
 						onChange={(event) => setName(event.target.value)}
-						className="h-10 min-w-0 flex-1 border-b border-input bg-transparent text-lg font-medium tracking-tight outline-none placeholder:text-subtle focus:border-primary"
+						className="h-10 min-w-0 flex-1 border-b border-input bg-transparent text-lg font-medium tracking-tight outline-none placeholder:text-subtle focus:border-foreground"
 					/>
 				</div>
 

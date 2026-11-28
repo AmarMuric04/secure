@@ -74,9 +74,8 @@ const PasswordField: React.FC<{
 					aria-expanded={isGeneratorOpen}
 					onClick={onGeneratorToggle}
 					className={cn(
-						"ml-1 inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg bg-primary px-2.5 text-[13px] font-medium text-primary-foreground transition-[background-color,box-shadow,transform] duration-200 ease-out-quint hover:bg-primary/90 active:scale-[0.97]",
-						isGeneratorOpen &&
-							"ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
+						"ml-1 inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md bg-card px-2.5 text-[13px] font-medium ring-1 ring-input transition-[background-color,transform] duration-200 ease-out-quint ring-inset hover:bg-accent active:scale-[0.97]",
+						isGeneratorOpen && "bg-accent",
 					)}
 				>
 					<Dices className="size-3.5" />

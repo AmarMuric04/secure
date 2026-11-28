@@ -41,7 +41,7 @@ const ComposerToolbar: React.FC<{
 					className="pr-2.5"
 				>
 					{submitLabel}
-					<kbd className="hidden h-5 items-center rounded bg-primary-foreground/15 px-1.5 font-sans text-[11px] font-medium sm:inline-flex">
+					<kbd className="hidden h-5 items-center rounded bg-background/15 px-1.5 font-sans text-[11px] font-medium sm:inline-flex">
 						{SHORTCUT_LABEL}
 					</kbd>
 				</Button>
