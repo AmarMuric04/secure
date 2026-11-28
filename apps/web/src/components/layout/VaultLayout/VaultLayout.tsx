@@ -34,7 +34,9 @@ const UnlockedVault: React.FC<{ autoLockMinutes: number }> = ({
 				<header className="flex h-12 shrink-0 items-center gap-2 border-b px-2 md:hidden">
 					<SidebarTrigger className="size-9" />
 					<VaultMark size="sm" />
-					<span className="font-semibold">Sealed</span>
+					<span className="text-[15px] font-semibold tracking-tight">
+						Sealed
+					</span>
 				</header>
 
 				<motion.div

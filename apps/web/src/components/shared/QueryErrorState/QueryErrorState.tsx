@@ -18,7 +18,7 @@ const QueryErrorState: React.FC<{
 			className="flex flex-col items-center justify-center px-6 py-16 text-center"
 		>
 			<TriangleAlert className="mb-4 size-6 text-destructive" />
-			<h2 className="font-semibold tracking-tight text-foreground">
+			<h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
 				{title}
 			</h2>
 			<p className="mt-1 max-w-sm text-sm text-muted-foreground">

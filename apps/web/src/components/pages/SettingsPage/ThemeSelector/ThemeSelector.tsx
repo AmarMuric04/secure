@@ -35,7 +35,7 @@ const ThemeSelector: React.FC = () => {
 
 	return (
 		<section>
-			<h2 className="text-[15px] font-semibold tracking-tight text-foreground">
+			<h2 className="text-lg font-medium tracking-[-0.02em] text-foreground">
 				Appearance
 			</h2>
 			<p className="mt-0.5 text-sm text-muted-foreground">
@@ -45,7 +45,7 @@ const ThemeSelector: React.FC = () => {
 			<div
 				role="radiogroup"
 				aria-label="Theme"
-				className="mt-4 grid grid-cols-3 gap-3 sm:gap-4"
+				className="mt-4 grid grid-cols-3 gap-3 border-t border-foreground/15 pt-5 sm:gap-4"
 			>
 				{THEMES.map(({ value, label }) => {
 					const isSelected = theme === value;
@@ -68,7 +68,7 @@ const ThemeSelector: React.FC = () => {
 											stiffness: 500,
 											damping: 38,
 										}}
-										className="absolute -inset-1 rounded-[14px] ring-2 ring-primary"
+										className="absolute -inset-1 rounded-[14px] ring-2 ring-foreground"
 									/>
 								)}
 								<span className="absolute inset-0 overflow-hidden rounded-[10px] ring-1 ring-border transition-transform duration-300 ease-out-quint group-hover:-translate-y-0.5 group-focus-visible:-translate-y-0.5 motion-reduce:transition-none">
