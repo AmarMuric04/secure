@@ -59,7 +59,7 @@ const AttentionList: React.FC<{
 		return (
 			<AnalyticsSection title="Needs attention">
 				<p className="flex items-center gap-2.5 text-sm text-muted-foreground">
-					<CheckCircle2 className="size-4.5 text-primary" />
+					<CheckCircle2 className="size-4.5 text-success" />
 					Nothing to fix. Every password is strong, unique and recent.
 				</p>
 			</AnalyticsSection>
@@ -95,7 +95,7 @@ const AttentionList: React.FC<{
 									{issue.action}
 								</span>
 							</span>
-							<span className="text-lg font-semibold tabular-nums">
+							<span className="text-lg font-medium tabular-nums">
 								{stats[issue.key]}
 							</span>
 							<ChevronRight className="size-4 text-subtle" />

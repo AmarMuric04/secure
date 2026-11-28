@@ -30,7 +30,7 @@ const SecurityProgress: React.FC<{
 					transition={{ duration: 0.9, ease: EASE_OUT }}
 					className={cn(
 						"h-full rounded-full",
-						isClear ? "bg-success" : "bg-primary",
+						isClear ? "bg-success" : "bg-foreground",
 					)}
 				/>
 			</div>

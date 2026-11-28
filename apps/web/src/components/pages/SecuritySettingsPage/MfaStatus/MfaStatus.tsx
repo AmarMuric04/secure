@@ -12,9 +12,7 @@ const MfaStatus: React.FC<{
 	return (
 		<div className="grid gap-x-8 gap-y-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 items-start gap-3.5">
-				<span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg bg-muted ring-1 ring-border">
-					<Smartphone className="size-4 text-muted-foreground" />
-				</span>
+				<Smartphone className="mt-0.5 size-4 shrink-0 text-subtle" />
 				<div className="min-w-0">
 					<p className="flex items-center gap-2 text-sm font-medium text-foreground">
 						Authenticator app
@@ -22,14 +20,14 @@ const MfaStatus: React.FC<{
 							className={cn(
 								"inline-flex h-5 items-center gap-1.5 overflow-hidden rounded-full px-2 text-xs font-medium transition-colors duration-300",
 								isEnabled
-									? "bg-primary-soft text-primary"
+									? "bg-accent text-foreground"
 									: "bg-accent text-muted-foreground",
 							)}
 						>
 							<span
 								className={cn(
 									"size-1.5 rounded-full transition-colors duration-300",
-									isEnabled ? "bg-primary" : "bg-subtle",
+									isEnabled ? "bg-success" : "bg-subtle",
 								)}
 							/>
 							<AnimatePresence mode="popLayout" initial={false}>
