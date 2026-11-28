@@ -37,9 +37,9 @@ const ImportSummary: React.FC<{
 					{invalid.slice(0, INVALID_PREVIEW_LIMIT).map((row) => (
 						<li key={row.rowNumber}>
 							<span className="font-mono text-subtle">
-								Row {row.rowNumber}
+								Row {row.rowNumber}:
 							</span>{" "}
-							· {row.reason}
+							{row.reason}
 						</li>
 					))}
 					{hiddenCount > 0 && (
