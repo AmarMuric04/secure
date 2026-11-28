@@ -15,7 +15,7 @@ export function Spinner({ size = "md", className }: SpinnerProps) {
 
 	return (
 		<Loader2
-			className={cn("animate-spin text-primary", sizes[size], className)}
+			className={cn("animate-spin text-subtle", sizes[size], className)}
 		/>
 	);
 }
@@ -38,16 +38,16 @@ export function EmptyState({
 	return (
 		<div
 			className={cn(
-				"flex flex-col items-center justify-center rounded-xl px-4 py-16 text-center ring-1 ring-border",
+				"flex flex-col items-center justify-center px-4 py-16 text-center",
 				className,
 			)}
 		>
 			{icon && (
-				<div className="mb-4 grid size-12 place-items-center rounded-xl bg-muted ring-1 ring-border [&_svg]:size-5 [&_svg]:text-muted-foreground">
+				<div className="mb-4 text-subtle [&_svg]:size-5">
 					{icon}
 				</div>
 			)}
-			<h3 className="mb-1 font-semibold tracking-tight text-foreground">
+			<h3 className="mb-1.5 text-xl font-medium tracking-[-0.02em] text-foreground">
 				{title}
 			</h3>
 			{description && (
